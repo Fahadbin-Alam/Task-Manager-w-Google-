@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Course Search</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    .search-container {
+      margin-bottom: 20px;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .course-list {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .course-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .course-item:last-child {
+      border-bottom: none;
+    }
+
+    .no-results {
+      padding: 20px;
+      text-align: center;
+      color: #777;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Course Planner</h2>
+
+  <!-- SEARCH INPUT -->
+  <div class="search-container">
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="Search by course name or code..."
+    />
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results" class="course-list"></div>
+
+  <script>
+    // Mock API call — replace with your real endpoint
+    async function fetchCourses() {
+      return [
+        { code: "CS164", name: "Introduction to Python" },
+        { code: "CS171", name: "Computer Science I" },
+        { code: "MATH121", name: "Calculus I" },
+        { code: "ENGL103", name: "Writing and Literature" },
+        { code: "BIO101", name: "General Biology" }
+      ];
+    }
+
+    const searchInput = document.getElementById("searchInput");
+    const resultsDiv = document.getElementById("results");
+
+    async function handleSearch() {
+      const query = searchInput.value.trim().toLowerCase();
+      const courses = await fetchCourses();
+
+      const filtered = courses.filter(course =>
+        course.code.toLowerCase().includes(query) ||
+        course.name.toLowerCase().includes(query)
+      );
+
+      renderResults(filtered);
+    }
+
+    function renderResults(list) {
+      resultsDiv.innerHTML = "";
+
+      if (list.length === 0) {
+        resultsDiv.innerHTML = `<div class="no-results">No results found</div>`;
+        return;
+      }
+
+      list.forEach(course => {
+        const item = document.createElement("div");
+        item.className = "course-item";
+        item.innerHTML = `<strong>${course.code}</strong> — ${course.name}`;
+        resultsDiv.appendChild(item);
+      });
+    }
+
+    // Live search
+    searchInput.addEventListener("input", handleSearch);
+
+    // Load all courses on page load
+    (async () => {
+      const courses = await fetchCourses();
+      renderResults(courses);
+    })();
+  </script>
+
+</body>
+</html>
