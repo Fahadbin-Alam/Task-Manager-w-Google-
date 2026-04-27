@@ -1,0 +1,71 @@
+const STUDY_SPOTS = [
+  {
+    name: "W. W. Hagerty Library",
+    type: ["library", "quiet"],
+    bestTime: "Morning",
+    crowd: "Busy"
+  },
+  {
+    name: "LeBow Study Rooms",
+    type: ["indoor", "group"],
+    bestTime: "Afternoon",
+    crowd: "Moderate"
+  },
+  {
+    name: "Korman Center Lounge",
+    type: ["indoor", "casual"],
+    bestTime: "Evening",
+    crowd: "Light"
+  },
+  {
+    name: "Dragon Hall Lounge",
+    type: ["indoor", "quiet"],
+    bestTime: "Night",
+    crowd: "Light"
+  },
+  {
+    name: "Main Building",
+    type: ["indoor", "casual"],
+    bestTime: "Afternoon",
+    crowd: "Busy"
+  },
+  {
+    name: "Buckley Green",
+    type: ["outdoor"],
+    bestTime: "Afternoon",
+    crowd: "Moderate"
+  },
+  {
+    name: "Race Street Lawn",
+    type: ["outdoor", "casual"],
+    bestTime: "Evening",
+    crowd: "Light"
+  }
+];
+
+function renderStudySpots(filter = "all") {
+  const results = document.getElementById("studyResults");
+
+  const filtered = STUDY_SPOTS.filter(spot =>
+    filter === "all" || spot.type.includes(filter)
+  );
+
+  results.innerHTML = filtered.map(spot => `
+    <div style="margin-bottom:12px; padding:10px; border:1px solid #ddd; border-radius:8px;">
+      <strong>${spot.name}</strong>
+      <p>Type: ${spot.type.join(", ")}</p>
+      <p>Best Time: ${spot.bestTime}</p>
+      <p>Crowd Level: ${spot.crowd}</p>
+    </div>
+  `).join("");
+}
+
+const studyFilterBtns = document.querySelectorAll("[data-study-filter]");
+
+studyFilterBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    renderStudySpots(btn.dataset.studyFilter);
+  });
+});
+
+renderStudySpots("all");
