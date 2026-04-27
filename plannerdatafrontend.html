@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Planner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    #plannerContainer {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+
+    .course-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .course-item:last-child {
+      border-bottom: none;
+    }
+
+    #saveBtn {
+      margin-top: 20px;
+      padding: 10px 16px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background: #0074d9;
+      color: white;
+      cursor: pointer;
+    }
+
+    #saveBtn:hover {
+      background: #005fa3;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Your Planner</h2>
+
+  <div id="plannerContainer"></div>
+
+  <button id="saveBtn">Save Planner</button>
+
+  <script>
+    // This will hold the user's planner courses
+    let plannerCourses = [];
+
+    // Load planner from backend on login/refresh
+    async function loadPlanner() {
+      try {
+        const res = await fetch("/api/planner");
+        const data = await res.json();
+        plannerCourses = data.courses || [];
+        renderPlanner();
+      } catch (err) {
+        console.error("Failed to load planner:", err);
+      }
+    }
+
+    // Render planner UI
+    function renderPlanner() {
+      const container = document.getElementById("plannerContainer");
+      container.innerHTML = "";
+
+      if (plannerCourses.length === 0) {
+        container.innerHTML = "<p>No courses added yet.</p>";
+        return;
+      }
+
+      plannerCourses.forEach(course => {
+        const div = document.createElement("div");
+        div.className = "course-item";
+        div.textContent = `${course.code} — ${course.name}`;
+        container.appendChild(div);
+      });
+    }
+
+    // Save planner to backend
+    async function savePlanner() {
+      try {
+        await fetch("/api/planner", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ courses: plannerCourses })
+        });
+
+        alert("Planner saved!");
+      } catch (err) {
+        console.error("Failed to save planner:", err);
+        alert("Error saving planner");
+      }
+    }
+
+    // Example: Add a course from another part of your UI
+    // Call this when user selects a course
+    function addCourse(course) {
+      plannerCourses.push(course);
+      renderPlanner();
+    }
+
+    document.getElementById("saveBtn").addEventListener("click", savePlanner);
+
+    // Load saved planner immediately
+    loadPlanner();
+  </script>
+
+</body>
+</html>
