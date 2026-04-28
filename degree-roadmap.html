@@ -1,0 +1,953 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Degree Roadmap — Succeed Drexel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:   #07294D;
+      --gold:   #FFC600;
+      --white:  #FFFFFF;
+      --off:    #F4F6F9;
+      --gray1:  #E8ECF2;
+      --gray2:  #C4CEDB;
+      --gray3:  #8898AA;
+      --text:   #0D1F35;
+      --muted:  #5A6B80;
+      --ok:     #1A7F4B;
+      --r:      16px;
+      --shadow: 0 2px 12px rgba(7,41,77,.10), 0 1px 3px rgba(7,41,77,.06);
+      --shadow-lg: 0 8px 32px rgba(7,41,77,.14), 0 2px 8px rgba(7,41,77,.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--off);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--navy);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 58px;
+      box-shadow: 0 1px 0 rgba(255,255,255,.08), var(--shadow);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: var(--gold); display: grid; place-items: center; font-size: 16px;
+    }
+    .brand-name { font-size: 16px; font-weight: 700; color: var(--white); }
+    .brand-name span { color: var(--gold); }
+    .back-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 8px;
+      background: rgba(255,255,255,.1); color: var(--white);
+      font-size: 13px; font-weight: 500;
+      border: 1px solid rgba(255,255,255,.15);
+      transition: background .15s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,.18); }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      background: var(--navy); padding: 32px 24px 28px; color: var(--white);
+    }
+    .page-header-inner { max-width: 1200px; margin: 0 auto; }
+    .page-header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .page-header h1 span { color: var(--gold); }
+    .page-header p { font-size: 14px; color: rgba(255,255,255,.6); }
+
+    /* ── CONTROLS BAR ── */
+    .controls-bar {
+      background: var(--white); border-bottom: 1px solid var(--gray1);
+      padding: 14px 24px; position: sticky; top: 58px; z-index: 90;
+      box-shadow: var(--shadow);
+    }
+    .controls-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .select-wrap { display: flex; align-items: center; gap: 8px; }
+    .select-wrap label { font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+    .styled-select {
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+      padding: 8px 36px 8px 12px; border: 1.5px solid var(--gray2); border-radius: 10px;
+      background: var(--off) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235A6B80' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+      -webkit-appearance: none; appearance: none; color: var(--text); cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .styled-select:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(7,41,77,.12); }
+    .legend {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .credit-badge {
+      margin-left: auto; display: flex; align-items: center; gap: 5px;
+      background: var(--off); border: 1px solid var(--gray1);
+      border-radius: 8px; padding: 6px 12px; font-size: 13px;
+    }
+    .credit-badge strong { color: var(--navy); font-size: 15px; }
+    .reset-btn {
+      font-size: 12px; color: var(--muted);
+      border: 1px solid var(--gray2); border-radius: 7px; padding: 5px 10px;
+      transition: background .15s, color .15s;
+    }
+    .reset-btn:hover { background: var(--off); color: var(--text); }
+    .progress-wrap {
+      max-width: 1200px; margin: 10px auto 0;
+      height: 4px; background: var(--gray1); border-radius: 2px; overflow: hidden;
+    }
+    .progress-bar { height: 100%; background: var(--gold); border-radius: 2px; transition: width .4s ease; }
+
+    /* ── MAIN ── */
+    .main { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; }
+
+    /* ── DEGREE INFO ── */
+    .degree-info {
+      background: var(--white); border: 1px solid var(--gray1);
+      border-radius: var(--r); padding: 20px 22px; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .degree-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: rgba(7,41,77,.08); display: grid; place-items: center; font-size: 22px; flex-shrink: 0;
+    }
+    .degree-info-text h2 { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+    .degree-info-text p { font-size: 13px; color: var(--muted); }
+    .degree-tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .degree-tag {
+      font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 6px;
+      background: rgba(7,41,77,.07); color: var(--navy);
+    }
+
+    /* ── STATS ── */
+    .stats-row { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+    .stat-card {
+      background: var(--white); border: 1px solid var(--gray1);
+      border-radius: 12px; padding: 14px 18px; flex: 1; min-width: 100px;
+    }
+    .stat-num { font-size: 22px; font-weight: 700; color: var(--navy); letter-spacing: -0.5px; }
+    .stat-lab { font-size: 11px; color: var(--gray3); margin-top: 2px; }
+
+    /* ── YEAR SECTION ── */
+    .year-section { margin-bottom: 32px; }
+    .year-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .year-badge {
+      background: var(--navy); color: var(--white);
+      font-size: 12px; font-weight: 700; letter-spacing: .06em;
+      padding: 4px 12px; border-radius: 999px; text-transform: uppercase;
+    }
+    .year-divider { flex: 1; height: 1px; background: var(--gray1); }
+    .year-credits { font-size: 12px; color: var(--muted); }
+
+    /* ── QUARTER GRID ── */
+    .quarter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 768px) { .quarter-grid { grid-template-columns: 1fr; } }
+    .quarter-label {
+      font-size: 11px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--gray3); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .q-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gray2); }
+    .fall-label .q-dot   { background: #F97316; }
+    .winter-label .q-dot { background: #0EA5E9; }
+    .spring-label .q-dot { background: #22C55E; }
+    .summer-label .q-dot { background: #EAB308; }
+
+    /* ── COURSE CARD ── */
+    .course-card {
+      background: var(--white); border: 1.5px solid var(--gray1);
+      border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+      cursor: pointer; transition: border-color .15s, box-shadow .15s;
+      position: relative; overflow: hidden;
+    }
+    .course-card:hover { border-color: var(--gray2); box-shadow: var(--shadow); }
+    .course-card.completed { background: #F0FDF4; border-color: #86EFAC; }
+    .course-card.completed .course-name { text-decoration: line-through; color: var(--muted); }
+    .course-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+    .course-code {
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      color: var(--navy); background: rgba(7,41,77,.07); padding: 2px 7px; border-radius: 5px; white-space: nowrap;
+    }
+    .course-name { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.35; }
+    .course-credits { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .check-icon {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 1.5px solid var(--gray2); display: grid; place-items: center;
+      flex-shrink: 0; font-size: 10px; transition: background .15s, border-color .15s;
+    }
+    .course-card.completed .check-icon { background: var(--ok); border-color: var(--ok); color: white; }
+
+    /* type accent bar */
+    .course-type-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+    .course-card[data-type="major"]   .course-type-bar { background: var(--navy); }
+    .course-card[data-type="math"]    .course-type-bar { background: var(--ok); }
+    .course-card[data-type="gen-ed"]  .course-type-bar { background: #7C3AED; }
+    .course-card[data-type="elective"].course-type-bar { background: #D97706; }
+    .course-card[data-type="coop"]    .course-type-bar { background: #0369A1; }
+    .course-card[data-type="free"]    .course-type-bar { background: var(--gray3); }
+
+    .coop-card { background: linear-gradient(135deg,#EFF6FF,#DBEAFE); border-color: #93C5FD; }
+    .coop-card:hover { border-color: #3B82F6; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 80px 24px; }
+    .empty-state .emoji { font-size: 52px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; color: var(--muted); max-width: 400px; margin: 0 auto; }
+
+    /* ── FOOTER NOTE ── */
+    .footer-note {
+      background: rgba(7,41,77,.04); border: 1px solid var(--gray1);
+      border-radius: 10px; padding: 12px 16px;
+      font-size: 12px; color: var(--muted); margin-top: 24px;
+    }
+    .footer-note a { color: var(--navy); text-decoration: underline; text-underline-offset: 2px; }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-name">Succeed <span>Drexel</span></div>
+    </div>
+    <a href="SUCCEED_Final_Version.html" class="back-btn">← Back to App</a>
+  </header>
+
+  <div class="page-header">
+    <div class="page-header-inner">
+      <h1>Degree <span>Roadmap</span></h1>
+      <p>Select your major to see a full course-by-course plan. Click any course to mark it complete and track your progress.</p>
+    </div>
+  </div>
+
+  <div class="controls-bar">
+    <div class="controls-inner">
+      <div class="select-wrap">
+        <label for="degreeSelect">Major</label>
+        <select class="styled-select" id="degreeSelect">
+          <option value="">— Choose a degree —</option>
+          <option value="cs">Computer Science (BS)</option>
+          <option value="is">Information Systems (BS)</option>
+          <option value="biz">Business Administration (BS)</option>
+          <option value="mech">Mechanical Engineering (BS)</option>
+          <option value="bio">Biology (BS)</option>
+          <option value="psych">Psychology (BS)</option>
+        </select>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--navy)"></div>Major Core</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--ok)"></div>Math / Science</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7C3AED"></div>Gen Ed</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#D97706"></div>Elective</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#0369A1"></div>Co-op</div>
+      </div>
+      <div class="credit-badge" id="creditBadge" style="display:none">
+        <span>Progress:</span>
+        <strong id="completedCredits">0</strong><span>/</span><strong id="totalCredits">180</strong>
+        <span style="color:var(--muted)">cr</span>
+      </div>
+      <button class="reset-btn" id="resetBtn" style="display:none" onclick="resetProgress()">Reset</button>
+    </div>
+    <div id="progressWrap" style="display:none">
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <main class="main" id="mainContent">
+    <div class="empty-state">
+      <div class="emoji">🗺️</div>
+      <h3>Select a degree to get started</h3>
+      <p>Choose your major from the dropdown above to see a complete course-by-course roadmap for all four years.</p>
+    </div>
+  </main>
+
+  <script>
+    const DEGREES = {
+      cs: {
+        name: 'Computer Science', degree: 'Bachelor of Science',
+        college: 'College of Computing & Informatics',
+        icon: '💻', totalCredits: 180,
+        tags: ['4 Years', 'Co-op', '180 Credits', 'CCI'],
+        years: [
+          { label: 'Year 1', quarters: {
+            fall: [
+              { code:'CS 150',   name:'Seminar in CS',             credits:1, type:'major' },
+              { code:'CS 171',   name:'Computer Programming I',    credits:3, type:'major' },
+              { code:'MATH 121', name:'Calculus I',                credits:4, type:'math'  },
+              { code:'ENGL 101', name:'Composition & Rhetoric I',  credits:3, type:'gen-ed'},
+              { code:'UNIV 101', name:'The Drexel Experience',     credits:2, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'CS 172',   name:'Computer Programming II',   credits:3, type:'major' },
+              { code:'MATH 122', name:'Calculus II',               credits:4, type:'math'  },
+              { code:'ENGL 102', name:'Composition & Rhetoric II', credits:3, type:'gen-ed'},
+              { code:'PHYS 100', name:'Physics I',                 credits:3, type:'math'  },
+              { code:'PHYS 100L',name:'Physics Lab I',             credits:1, type:'math'  },
+            ],
+            spring: [
+              { code:'CS 260',   name:'Data Structures',           credits:3, type:'major' },
+              { code:'MATH 123', name:'Calculus III',              credits:4, type:'math'  },
+              { code:'PHYS 101', name:'Physics II',                credits:3, type:'math'  },
+              { code:'PHYS 101L',name:'Physics Lab II',            credits:1, type:'math'  },
+              { code:'CS 270',   name:'Computer Systems',          credits:3, type:'major' },
+            ],
+          }},
+          { label: 'Year 2', quarters: {
+            fall: [
+              { code:'CS 283',   name:'Systems Programming',       credits:3, type:'major' },
+              { code:'CS 275',   name:'Concepts of Math Reasoning',credits:3, type:'math'  },
+              { code:'MATH 201', name:'Linear Algebra',            credits:4, type:'math'  },
+              { code:'CISC 275', name:'Intro to Software Engineering',credits:3,type:'major'},
+            ],
+            winter: [
+              { code:'CS 281',   name:'Computer Organization',     credits:3, type:'major' },
+              { code:'MATH 210', name:'Discrete Mathematics',      credits:3, type:'math'  },
+              { code:'CS Elective',name:'CS Elective',             credits:3, type:'elective'},
+              { code:'Gen Ed',   name:'General Education Course',  credits:3, type:'gen-ed'},
+            ],
+            spring: [
+              { code:'CO-OP', name:'Co-op Work Experience I', credits:0, type:'coop', coop:true },
+            ],
+          }},
+          { label: 'Year 3', quarters: {
+            fall: [
+              { code:'CS 360',   name:'Analysis of Algorithms',    credits:3, type:'major' },
+              { code:'CS 375',   name:'Software Engineering',      credits:3, type:'major' },
+              { code:'CS Elective',name:'CS Elective',             credits:3, type:'elective'},
+              { code:'Gen Ed',   name:'General Education Course',  credits:3, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'CO-OP', name:'Co-op Work Experience II', credits:0, type:'coop', coop:true },
+            ],
+            spring: [
+              { code:'CS 451',   name:'Advanced Programming',      credits:3, type:'major' },
+              { code:'CS 475',   name:'Software Verification',     credits:3, type:'major' },
+              { code:'CS Elective',name:'CS Elective',             credits:3, type:'elective'},
+              { code:'Gen Ed',   name:'General Education Course',  credits:3, type:'gen-ed'},
+            ],
+          }},
+          { label: 'Year 4', quarters: {
+            fall: [
+              { code:'CS 480',      name:'Senior Project I',       credits:3, type:'major' },
+              { code:'CS Elective', name:'CS Elective',            credits:3, type:'elective'},
+              { code:'CS Elective', name:'CS Elective',            credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',         credits:3, type:'free'   },
+            ],
+            winter: [
+              { code:'CS 481',      name:'Senior Project II',      credits:3, type:'major' },
+              { code:'CS Elective', name:'CS Elective',            credits:3, type:'elective'},
+              { code:'CS Elective', name:'CS Elective',            credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',         credits:3, type:'free'   },
+            ],
+            spring: [
+              { code:'CS 482',      name:'Senior Project III',     credits:3, type:'major' },
+              { code:'CS Elective', name:'CS Elective',            credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',         credits:3, type:'free'   },
+              { code:'Free Elective',name:'Free Elective',         credits:3, type:'free'   },
+            ],
+          }},
+        ]
+      },
+
+      is: {
+        name: 'Information Systems', degree: 'Bachelor of Science',
+        college: 'College of Computing & Informatics',
+        icon: '📊', totalCredits: 180,
+        tags: ['4 Years', 'Co-op', '180 Credits', 'CCI'],
+        years: [
+          { label: 'Year 1', quarters: {
+            fall: [
+              { code:'INFO 101', name:'Intro to Information Systems', credits:3, type:'major' },
+              { code:'CS 171',   name:'Computer Programming I',       credits:3, type:'major' },
+              { code:'MATH 101', name:'Intro to Analysis I',          credits:3, type:'math'  },
+              { code:'ENGL 101', name:'Composition & Rhetoric I',     credits:3, type:'gen-ed'},
+              { code:'UNIV 101', name:'The Drexel Experience',        credits:2, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'INFO 110', name:'Information Needs & Systems',  credits:3, type:'major' },
+              { code:'CS 172',   name:'Computer Programming II',      credits:3, type:'major' },
+              { code:'MATH 102', name:'Intro to Analysis II',         credits:3, type:'math'  },
+              { code:'ENGL 102', name:'Composition & Rhetoric II',    credits:3, type:'gen-ed'},
+              { code:'STAT 201', name:'Introduction to Statistics',   credits:3, type:'math'  },
+            ],
+            spring: [
+              { code:'INFO 200', name:'Principles of IS',             credits:3, type:'major' },
+              { code:'CS 260',   name:'Data Structures',              credits:3, type:'major' },
+              { code:'MATH 210', name:'Discrete Mathematics',         credits:3, type:'math'  },
+              { code:'Gen Ed',   name:'General Education Course',     credits:3, type:'gen-ed'},
+            ],
+          }},
+          { label: 'Year 2', quarters: {
+            fall: [
+              { code:'INFO 210', name:'Database Concepts',            credits:3, type:'major' },
+              { code:'INFO 220', name:'Intro to HCI',                 credits:3, type:'major' },
+              { code:'CS 265',   name:'Web Systems Development',      credits:3, type:'major' },
+              { code:'STAT 202', name:'Probability & Statistics',     credits:3, type:'math'  },
+            ],
+            winter: [
+              { code:'INFO 310', name:'Systems Analysis & Design',    credits:3, type:'major' },
+              { code:'INFO 320', name:'Database Systems',             credits:3, type:'major' },
+              { code:'ACCT 115', name:'Accounting for Managers',      credits:4, type:'elective'},
+              { code:'Gen Ed',   name:'General Education Course',     credits:3, type:'gen-ed'},
+            ],
+            spring: [
+              { code:'CO-OP', name:'Co-op Work Experience I', credits:0, type:'coop', coop:true },
+            ],
+          }},
+          { label: 'Year 3', quarters: {
+            fall: [
+              { code:'INFO 410', name:'Network Systems',              credits:3, type:'major' },
+              { code:'INFO 430', name:'IT Project Management',        credits:3, type:'major' },
+              { code:'IS Elective',name:'IS Elective',                credits:3, type:'elective'},
+              { code:'Gen Ed',   name:'General Education Course',     credits:3, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'CO-OP', name:'Co-op Work Experience II', credits:0, type:'coop', coop:true },
+            ],
+            spring: [
+              { code:'INFO 440', name:'Information Security',         credits:3, type:'major' },
+              { code:'INFO 445', name:'Enterprise Systems',           credits:3, type:'major' },
+              { code:'IS Elective',name:'IS Elective',                credits:3, type:'elective'},
+              { code:'Gen Ed',   name:'General Education Course',     credits:3, type:'gen-ed'},
+            ],
+          }},
+          { label: 'Year 4', quarters: {
+            fall: [
+              { code:'INFO 480',    name:'Senior Project I',          credits:3, type:'major' },
+              { code:'IS Elective', name:'IS Elective',               credits:3, type:'elective'},
+              { code:'IS Elective', name:'IS Elective',               credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+            winter: [
+              { code:'INFO 481',    name:'Senior Project II',         credits:3, type:'major' },
+              { code:'IS Elective', name:'IS Elective',               credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+            spring: [
+              { code:'INFO 482',    name:'Senior Project III',        credits:3, type:'major' },
+              { code:'IS Elective', name:'IS Elective',               credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+          }},
+        ]
+      },
+
+      biz: {
+        name: 'Business Administration', degree: 'Bachelor of Science',
+        college: 'LeBow College of Business',
+        icon: '📈', totalCredits: 180,
+        tags: ['4 Years', 'Co-op', '180 Credits', 'LeBow'],
+        years: [
+          { label: 'Year 1', quarters: {
+            fall: [
+              { code:'BUSA 103', name:'Business Fundamentals',        credits:4, type:'major' },
+              { code:'ACCT 115', name:'Accounting for Managers',      credits:4, type:'major' },
+              { code:'ENGL 101', name:'Composition & Rhetoric I',     credits:3, type:'gen-ed'},
+              { code:'UNIV 101', name:'The Drexel Experience',        credits:2, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'BUSA 200', name:'Intro to Business Analytics',  credits:3, type:'major' },
+              { code:'ACCT 116', name:'Financial Accounting',         credits:4, type:'major' },
+              { code:'ENGL 102', name:'Composition & Rhetoric II',    credits:3, type:'gen-ed'},
+              { code:'STAT 201', name:'Introduction to Statistics',   credits:3, type:'math'  },
+            ],
+            spring: [
+              { code:'BUSA 201', name:'Business Communication',       credits:3, type:'major' },
+              { code:'ECON 201', name:'Microeconomics',               credits:3, type:'math'  },
+              { code:'MATH 101', name:'Intro to Analysis I',          credits:3, type:'math'  },
+              { code:'Gen Ed',   name:'General Education Course',     credits:3, type:'gen-ed'},
+            ],
+          }},
+          { label: 'Year 2', quarters: {
+            fall: [
+              { code:'MKTG 301', name:'Marketing Principles',         credits:3, type:'major' },
+              { code:'FIN 301',  name:'Financial Management',         credits:3, type:'major' },
+              { code:'ECON 202', name:'Macroeconomics',               credits:3, type:'math'  },
+              { code:'BUSA 300', name:'Business Law',                 credits:3, type:'major' },
+            ],
+            winter: [
+              { code:'MGMT 310', name:'Organizational Behavior',      credits:3, type:'major' },
+              { code:'OPS 301',  name:'Operations Management',        credits:3, type:'major' },
+              { code:'FIN 302',  name:'Corporate Finance',            credits:3, type:'major' },
+              { code:'Gen Ed',   name:'General Education Course',     credits:3, type:'gen-ed'},
+            ],
+            spring: [
+              { code:'CO-OP', name:'Co-op Work Experience I', credits:0, type:'coop', coop:true },
+            ],
+          }},
+          { label: 'Year 3', quarters: {
+            fall: [
+              { code:'BUSA 401',    name:'Strategic Management',      credits:3, type:'major' },
+              { code:'Biz Elective',name:'Business Elective',         credits:3, type:'elective'},
+              { code:'Biz Elective',name:'Business Elective',         credits:3, type:'elective'},
+              { code:'Gen Ed',      name:'General Education Course',  credits:3, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'CO-OP', name:'Co-op Work Experience II', credits:0, type:'coop', coop:true },
+            ],
+            spring: [
+              { code:'MGMT 450',    name:'Leadership & Ethics',       credits:3, type:'major' },
+              { code:'Biz Elective',name:'Business Elective',         credits:3, type:'elective'},
+              { code:'Biz Elective',name:'Business Elective',         credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+          }},
+          { label: 'Year 4', quarters: {
+            fall: [
+              { code:'BUSA 480',    name:'Strategy Capstone I',       credits:3, type:'major' },
+              { code:'Biz Elective',name:'Business Elective',         credits:3, type:'elective'},
+              { code:'Biz Elective',name:'Business Elective',         credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+            winter: [
+              { code:'BUSA 481',    name:'Strategy Capstone II',      credits:3, type:'major' },
+              { code:'Biz Elective',name:'Business Elective',         credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+            spring: [
+              { code:'BUSA 482',    name:'Strategy Capstone III',     credits:3, type:'major' },
+              { code:'Biz Elective',name:'Business Elective',         credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+          }},
+        ]
+      },
+
+      mech: {
+        name: 'Mechanical Engineering', degree: 'Bachelor of Science',
+        college: 'College of Engineering',
+        icon: '⚙️', totalCredits: 186,
+        tags: ['4 Years', 'Co-op', '186 Credits', 'COE'],
+        years: [
+          { label: 'Year 1', quarters: {
+            fall: [
+              { code:'ENGR 101', name:'Intro to Engineering Design',  credits:3, type:'major' },
+              { code:'MATH 121', name:'Calculus I',                   credits:4, type:'math'  },
+              { code:'PHYS 100', name:'Physics I (Mechanics)',         credits:3, type:'math'  },
+              { code:'PHYS 100L',name:'Physics Lab I',                credits:1, type:'math'  },
+              { code:'ENGL 101', name:'Composition & Rhetoric I',     credits:3, type:'gen-ed'},
+              { code:'UNIV 101', name:'The Drexel Experience',        credits:2, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'ENGR 115', name:'Programming for Engineers',    credits:3, type:'major' },
+              { code:'MATH 122', name:'Calculus II',                  credits:4, type:'math'  },
+              { code:'PHYS 101', name:'Physics II (Electricity)',      credits:3, type:'math'  },
+              { code:'PHYS 101L',name:'Physics Lab II',               credits:1, type:'math'  },
+              { code:'ENGL 102', name:'Composition & Rhetoric II',    credits:3, type:'gen-ed'},
+            ],
+            spring: [
+              { code:'MEM 202',  name:'Statics',                      credits:3, type:'major' },
+              { code:'MATH 123', name:'Calculus III',                 credits:4, type:'math'  },
+              { code:'PHYS 102', name:'Physics III (Thermodynamics)', credits:3, type:'math'  },
+              { code:'CHEM 101', name:'General Chemistry I',          credits:3, type:'math'  },
+            ],
+          }},
+          { label: 'Year 2', quarters: {
+            fall: [
+              { code:'MEM 220',  name:'Dynamics',                     credits:3, type:'major' },
+              { code:'MEM 230',  name:'Mechanics of Materials',       credits:3, type:'major' },
+              { code:'MATH 200', name:'Multivariate Calculus',        credits:4, type:'math'  },
+              { code:'ECE 200',  name:'Electric Circuits',            credits:3, type:'major' },
+            ],
+            winter: [
+              { code:'MEM 310',  name:'Thermodynamics',               credits:3, type:'major' },
+              { code:'MEM 320',  name:'Fluid Mechanics',              credits:3, type:'major' },
+              { code:'MATH 201', name:'Linear Algebra',               credits:4, type:'math'  },
+              { code:'Gen Ed',   name:'General Education Course',     credits:3, type:'gen-ed'},
+            ],
+            spring: [
+              { code:'CO-OP', name:'Co-op Work Experience I', credits:0, type:'coop', coop:true },
+            ],
+          }},
+          { label: 'Year 3', quarters: {
+            fall: [
+              { code:'MEM 331',    name:'Machine Design',             credits:3, type:'major' },
+              { code:'MEM 340',    name:'Heat Transfer',              credits:3, type:'major' },
+              { code:'MEM 350',    name:'Manufacturing Processes',    credits:3, type:'major' },
+              { code:'Gen Ed',     name:'General Education Course',   credits:3, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'CO-OP', name:'Co-op Work Experience II', credits:0, type:'coop', coop:true },
+            ],
+            spring: [
+              { code:'MEM 407',    name:'Control Systems',            credits:3, type:'major' },
+              { code:'MEM 420',    name:'Vibrations & Dynamics',      credits:3, type:'major' },
+              { code:'ME Elective',name:'ME Technical Elective',      credits:3, type:'elective'},
+              { code:'Gen Ed',     name:'General Education Course',   credits:3, type:'gen-ed'},
+            ],
+          }},
+          { label: 'Year 4', quarters: {
+            fall: [
+              { code:'MEM 480',    name:'Senior Design I',            credits:3, type:'major' },
+              { code:'ME Elective',name:'ME Technical Elective',      credits:3, type:'elective'},
+              { code:'ME Elective',name:'ME Technical Elective',      credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+            winter: [
+              { code:'MEM 481',    name:'Senior Design II',           credits:3, type:'major' },
+              { code:'ME Elective',name:'ME Technical Elective',      credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+            spring: [
+              { code:'MEM 482',    name:'Senior Design III',          credits:3, type:'major' },
+              { code:'ME Elective',name:'ME Technical Elective',      credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+          }},
+        ]
+      },
+
+      bio: {
+        name: 'Biology', degree: 'Bachelor of Science',
+        college: 'College of Arts & Sciences',
+        icon: '🔬', totalCredits: 180,
+        tags: ['4 Years', 'Co-op', '180 Credits', 'CAS'],
+        years: [
+          { label: 'Year 1', quarters: {
+            fall: [
+              { code:'BIO 121',   name:'General Biology I',           credits:3, type:'major' },
+              { code:'BIO 121L',  name:'General Biology Lab I',       credits:1, type:'major' },
+              { code:'CHEM 101',  name:'General Chemistry I',         credits:3, type:'math'  },
+              { code:'CHEM 101L', name:'Chemistry Lab I',             credits:1, type:'math'  },
+              { code:'ENGL 101',  name:'Composition & Rhetoric I',    credits:3, type:'gen-ed'},
+              { code:'UNIV 101',  name:'The Drexel Experience',       credits:2, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'BIO 122',   name:'General Biology II',          credits:3, type:'major' },
+              { code:'BIO 122L',  name:'General Biology Lab II',      credits:1, type:'major' },
+              { code:'CHEM 102',  name:'General Chemistry II',        credits:3, type:'math'  },
+              { code:'CHEM 102L', name:'Chemistry Lab II',            credits:1, type:'math'  },
+              { code:'ENGL 102',  name:'Composition & Rhetoric II',   credits:3, type:'gen-ed'},
+              { code:'MATH 101',  name:'Intro to Analysis I',         credits:3, type:'math'  },
+            ],
+            spring: [
+              { code:'BIO 123',   name:'General Biology III',         credits:3, type:'major' },
+              { code:'BIO 123L',  name:'General Biology Lab III',     credits:1, type:'major' },
+              { code:'CHEM 103',  name:'General Chemistry III',       credits:3, type:'math'  },
+              { code:'CHEM 103L', name:'Chemistry Lab III',           credits:1, type:'math'  },
+              { code:'MATH 102',  name:'Intro to Analysis II',        credits:3, type:'math'  },
+            ],
+          }},
+          { label: 'Year 2', quarters: {
+            fall: [
+              { code:'BIO 201',   name:'Cell Biology',                credits:3, type:'major' },
+              { code:'BIO 220',   name:'Genetics',                    credits:3, type:'major' },
+              { code:'CHEM 241',  name:'Organic Chemistry I',         credits:3, type:'math'  },
+              { code:'CHEM 241L', name:'Organic Chemistry Lab I',     credits:2, type:'math'  },
+              { code:'STAT 201',  name:'Intro to Statistics',         credits:3, type:'math'  },
+            ],
+            winter: [
+              { code:'BIO 310',   name:'Ecology',                     credits:3, type:'major' },
+              { code:'BIO 360',   name:'Biochemistry',                credits:3, type:'major' },
+              { code:'CHEM 242',  name:'Organic Chemistry II',        credits:3, type:'math'  },
+              { code:'Gen Ed',    name:'General Education Course',    credits:3, type:'gen-ed'},
+            ],
+            spring: [
+              { code:'CO-OP', name:'Co-op Work Experience I', credits:0, type:'coop', coop:true },
+            ],
+          }},
+          { label: 'Year 3', quarters: {
+            fall: [
+              { code:'BIO 320',     name:'Molecular Biology',         credits:3, type:'major' },
+              { code:'BIO 340',     name:'Evolution',                 credits:3, type:'major' },
+              { code:'Bio Elective',name:'Biology Elective',          credits:3, type:'elective'},
+              { code:'Gen Ed',      name:'General Education Course',  credits:3, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'CO-OP', name:'Co-op Work Experience II', credits:0, type:'coop', coop:true },
+            ],
+            spring: [
+              { code:'BIO 410',     name:'Microbiology',              credits:3, type:'major' },
+              { code:'BIO 420',     name:'Physiology',                credits:3, type:'major' },
+              { code:'Bio Elective',name:'Biology Elective',          credits:3, type:'elective'},
+              { code:'Gen Ed',      name:'General Education Course',  credits:3, type:'gen-ed'},
+            ],
+          }},
+          { label: 'Year 4', quarters: {
+            fall: [
+              { code:'BIO 480',     name:'Senior Research I',         credits:3, type:'major' },
+              { code:'Bio Elective',name:'Biology Elective',          credits:3, type:'elective'},
+              { code:'Bio Elective',name:'Biology Elective',          credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+            winter: [
+              { code:'BIO 481',     name:'Senior Research II',        credits:3, type:'major' },
+              { code:'Bio Elective',name:'Biology Elective',          credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+            spring: [
+              { code:'BIO 482',     name:'Senior Research III',       credits:3, type:'major' },
+              { code:'Bio Elective',name:'Biology Elective',          credits:3, type:'elective'},
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+              { code:'Free Elective',name:'Free Elective',            credits:3, type:'free'   },
+            ],
+          }},
+        ]
+      },
+
+      psych: {
+        name: 'Psychology', degree: 'Bachelor of Science',
+        college: 'College of Arts & Sciences',
+        icon: '🧠', totalCredits: 180,
+        tags: ['4 Years', 'Co-op', '180 Credits', 'CAS'],
+        years: [
+          { label: 'Year 1', quarters: {
+            fall: [
+              { code:'PSYC 101', name:'General Psychology',           credits:3, type:'major' },
+              { code:'PSYC 150', name:'Psychology Proseminar',        credits:1, type:'major' },
+              { code:'ENGL 101', name:'Composition & Rhetoric I',     credits:3, type:'gen-ed'},
+              { code:'UNIV 101', name:'The Drexel Experience',        credits:2, type:'gen-ed'},
+              { code:'Gen Ed',   name:'General Education Course',     credits:3, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'PSYC 200', name:'Research Methods in Psych',    credits:3, type:'major' },
+              { code:'PSYC 210', name:'Stats for Psychology',         credits:3, type:'math'  },
+              { code:'ENGL 102', name:'Composition & Rhetoric II',    credits:3, type:'gen-ed'},
+              { code:'BIO 101',  name:'Intro to Biology',             credits:3, type:'math'  },
+            ],
+            spring: [
+              { code:'PSYC 220', name:'Abnormal Psychology',          credits:3, type:'major' },
+              { code:'PSYC 230', name:'Developmental Psychology',     credits:3, type:'major' },
+              { code:'STAT 201', name:'Intro to Statistics',          credits:3, type:'math'  },
+              { code:'Gen Ed',   name:'General Education Course',     credits:3, type:'gen-ed'},
+            ],
+          }},
+          { label: 'Year 2', quarters: {
+            fall: [
+              { code:'PSYC 300', name:'Biopsychology',                credits:3, type:'major' },
+              { code:'PSYC 310', name:'Cognitive Psychology',         credits:3, type:'major' },
+              { code:'PSYC 320', name:'Social Psychology',            credits:3, type:'major' },
+              { code:'Gen Ed',   name:'General Education Course',     credits:3, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'PSYC 350', name:'Personality',                  credits:3, type:'major' },
+              { code:'PSYC 360', name:'Learning & Motivation',        credits:3, type:'major' },
+              { code:'Psych Elective',name:'Psych Elective',          credits:3, type:'elective'},
+              { code:'Gen Ed',   name:'General Education Course',     credits:3, type:'gen-ed'},
+            ],
+            spring: [
+              { code:'CO-OP', name:'Co-op Work Experience I', credits:0, type:'coop', coop:true },
+            ],
+          }},
+          { label: 'Year 3', quarters: {
+            fall: [
+              { code:'PSYC 401',      name:'Advanced Research Methods',credits:3, type:'major' },
+              { code:'PSYC 420',      name:'Clinical Psychology',      credits:3, type:'major' },
+              { code:'Psych Elective',name:'Psych Elective',           credits:3, type:'elective'},
+              { code:'Gen Ed',        name:'General Education Course', credits:3, type:'gen-ed'},
+            ],
+            winter: [
+              { code:'CO-OP', name:'Co-op Work Experience II', credits:0, type:'coop', coop:true },
+            ],
+            spring: [
+              { code:'PSYC 440',      name:'Sensation & Perception',  credits:3, type:'major' },
+              { code:'PSYC 450',      name:'Psych Testing & Assessment',credits:3,type:'major' },
+              { code:'Psych Elective',name:'Psych Elective',           credits:3, type:'elective'},
+              { code:'Free Elective', name:'Free Elective',            credits:3, type:'free'   },
+            ],
+          }},
+          { label: 'Year 4', quarters: {
+            fall: [
+              { code:'PSYC 480',      name:'Senior Thesis I',          credits:3, type:'major' },
+              { code:'Psych Elective',name:'Psych Elective',           credits:3, type:'elective'},
+              { code:'Psych Elective',name:'Psych Elective',           credits:3, type:'elective'},
+              { code:'Free Elective', name:'Free Elective',            credits:3, type:'free'   },
+            ],
+            winter: [
+              { code:'PSYC 481',      name:'Senior Thesis II',         credits:3, type:'major' },
+              { code:'Psych Elective',name:'Psych Elective',           credits:3, type:'elective'},
+              { code:'Free Elective', name:'Free Elective',            credits:3, type:'free'   },
+              { code:'Free Elective', name:'Free Elective',            credits:3, type:'free'   },
+            ],
+            spring: [
+              { code:'PSYC 482',      name:'Senior Thesis III',        credits:3, type:'major' },
+              { code:'Psych Elective',name:'Psych Elective',           credits:3, type:'elective'},
+              { code:'Free Elective', name:'Free Elective',            credits:3, type:'free'   },
+              { code:'Free Elective', name:'Free Elective',            credits:3, type:'free'   },
+            ],
+          }},
+        ]
+      },
+    };
+
+    // ── STATE ──
+    let completedCourses = new Set();
+    let currentDegree = null;
+
+    const QUARTER_META = {
+      fall:   { label: 'Fall Quarter',   cls: 'fall-label'   },
+      winter: { label: 'Winter Quarter', cls: 'winter-label' },
+      spring: { label: 'Spring Quarter', cls: 'spring-label' },
+    };
+
+    function cid(yi, q, ci) {
+      return `${currentDegree}-y${yi}-${q}-c${ci}`;
+    }
+
+    function updateHeader(degree) {
+      let totalCr = 0, doneCr = 0, totalCourses = 0, doneCourses = 0;
+      degree.years.forEach((yr, yi) => {
+        Object.entries(yr.quarters).forEach(([q, courses]) => {
+          courses.forEach((c, ci) => {
+            totalCr += c.credits;
+            if (!c.coop) totalCourses++;
+            if (completedCourses.has(cid(yi, q, ci))) { doneCr += c.credits; doneCourses++; }
+          });
+        });
+      });
+      const pct = totalCr > 0 ? Math.round(doneCr / totalCr * 100) : 0;
+      document.getElementById('creditBadge').style.display = 'flex';
+      document.getElementById('progressWrap').style.display = 'block';
+      document.getElementById('resetBtn').style.display = 'block';
+      document.getElementById('completedCredits').textContent = doneCr;
+      document.getElementById('totalCredits').textContent = totalCr;
+      document.getElementById('progressBar').style.width = pct + '%';
+      return { totalCr, doneCr, totalCourses, doneCourses, pct };
+    }
+
+    function renderDegree(key) {
+      currentDegree = key;
+      const degree = DEGREES[key];
+      const stats = updateHeader(degree);
+
+      let html = `
+        <div class="degree-info">
+          <div class="degree-icon">${degree.icon}</div>
+          <div class="degree-info-text">
+            <h2>${degree.name}</h2>
+            <p>${degree.degree} &bull; ${degree.college}</p>
+            <div class="degree-tags">${degree.tags.map(t => `<span class="degree-tag">${t}</span>`).join('')}</div>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-num">${degree.totalCredits}</div><div class="stat-lab">Total Credits</div></div>
+          <div class="stat-card"><div class="stat-num">${stats.totalCourses}</div><div class="stat-lab">Courses</div></div>
+          <div class="stat-card"><div class="stat-num">4</div><div class="stat-lab">Years</div></div>
+          <div class="stat-card"><div class="stat-num">${stats.doneCourses}</div><div class="stat-lab">Completed</div></div>
+          <div class="stat-card"><div class="stat-num">${stats.pct}%</div><div class="stat-lab">Progress</div></div>
+        </div>
+      `;
+
+      degree.years.forEach((yr, yi) => {
+        let yrCr = 0;
+        Object.values(yr.quarters).forEach(courses => courses.forEach(c => yrCr += c.credits));
+
+        html += `
+          <div class="year-section">
+            <div class="year-header">
+              <div class="year-badge">${yr.label}</div>
+              <div class="year-divider"></div>
+              <div class="year-credits">${yrCr} credits</div>
+            </div>
+            <div class="quarter-grid">
+        `;
+
+        Object.entries(yr.quarters).forEach(([q, courses]) => {
+          const qm = QUARTER_META[q] || { label: q, cls: '' };
+          html += `<div class="quarter-col">
+            <div class="quarter-label ${qm.cls}"><span class="q-dot"></span>${qm.label}</div>`;
+
+          courses.forEach((c, ci) => {
+            const id = cid(yi, q, ci);
+            const done = completedCourses.has(id);
+
+            if (c.coop) {
+              html += `
+                <div class="course-card coop-card" data-type="coop" onclick="toggleCourse('${id}')">
+                  <div class="course-type-bar"></div>
+                  <div class="course-card-top">
+                    <span class="course-code" style="background:rgba(3,105,161,.12);color:#0369A1">${c.code}</span>
+                    <div class="check-icon" style="${done ? 'background:#1A7F4B;border-color:#1A7F4B;color:white' : ''}">${done ? '✓' : ''}</div>
+                  </div>
+                  <div class="course-name" style="color:#0369A1;font-weight:600">${c.name}</div>
+                  <div class="course-credits" style="color:#0369A1">Full-time work term</div>
+                </div>`;
+            } else {
+              html += `
+                <div class="course-card${done ? ' completed' : ''}" data-type="${c.type}" onclick="toggleCourse('${id}')">
+                  <div class="course-type-bar"></div>
+                  <div class="course-card-top">
+                    <span class="course-code">${c.code}</span>
+                    <div class="check-icon">${done ? '✓' : ''}</div>
+                  </div>
+                  <div class="course-name">${c.name}</div>
+                  ${c.credits > 0 ? `<div class="course-credits">${c.credits} cr</div>` : ''}
+                </div>`;
+            }
+          });
+
+          html += `</div>`;
+        });
+
+        html += `</div></div>`;
+      });
+
+      html += `
+        <div class="footer-note">
+          <strong>Note:</strong> This roadmap is a general guide based on Drexel's undergraduate curriculum.
+          Requirements may vary by year and concentration. Always confirm with your academic advisor and the
+          <a href="https://catalog.drexel.edu/coursedescriptions/quarter/undergrad/" target="_blank" rel="noopener">official Drexel catalog ↗</a>.
+          Click any course card to mark it complete and track your progress.
+        </div>`;
+
+      document.getElementById('mainContent').innerHTML = html;
+    }
+
+    function toggleCourse(id) {
+      completedCourses.has(id) ? completedCourses.delete(id) : completedCourses.add(id);
+      localStorage.setItem('roadmap-completed', JSON.stringify([...completedCourses]));
+      renderDegree(currentDegree);
+    }
+
+    function resetProgress() {
+      if (!confirm('Reset all progress for this degree?')) return;
+      completedCourses.clear();
+      localStorage.removeItem('roadmap-completed');
+      renderDegree(currentDegree);
+    }
+
+    document.getElementById('degreeSelect').addEventListener('change', function () {
+      if (!this.value) {
+        document.getElementById('mainContent').innerHTML = `
+          <div class="empty-state">
+            <div class="emoji">🗺️</div>
+            <h3>Select a degree to get started</h3>
+            <p>Choose your major from the dropdown above to see a complete course-by-course roadmap for all four years.</p>
+          </div>`;
+        ['creditBadge','progressWrap','resetBtn'].forEach(id => document.getElementById(id).style.display='none');
+        return;
+      }
+      localStorage.setItem('roadmap-degree', this.value);
+      renderDegree(this.value);
+    });
+
+    // Restore on load
+    const saved = localStorage.getItem('roadmap-completed');
+    if (saved) completedCourses = new Set(JSON.parse(saved));
+    const savedDegree = localStorage.getItem('roadmap-degree');
+    if (savedDegree && DEGREES[savedDegree]) {
+      document.getElementById('degreeSelect').value = savedDegree;
+      renderDegree(savedDegree);
+    }
+  </script>
+</body>
+</html>
