@@ -344,87 +344,78 @@ export default function App(): React.JSX.Element {
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           {activeScreen === "focus" ? (
             <>
-              <View style={styles.heroCard}>
-                <Text style={styles.heroTag}>HABITS</Text>
-                <Text style={styles.heroTitle}>Minimal Tracker</Text>
-                <Text style={styles.heroSub}>Tap habit name for graph. Tap check button to mark done.</Text>
-                <Text style={styles.focusCountText}>
-                  {habitItems.length === 0 ? "No habits yet" : `${habitsDoneToday}/${habitItems.length} done today`}
-                </Text>
+              <View style={styles.focusHeaderRow}>
+                <Text style={styles.focusPageTitle}>Habits</Text>
                 <Pressable style={styles.compactSwitchButton} onPress={() => setActiveScreen("dashboard")}>
-                  <Text style={styles.compactSwitchText}>Open Dashboard</Text>
+                  <Text style={styles.compactSwitchText}>Dashboard</Text>
                 </Pressable>
               </View>
 
-              <View style={styles.card}>
-                <View style={styles.minimalAddRow}>
-                  <TextInput
-                    value={habitDraft}
-                    onChangeText={setHabitDraft}
-                    placeholder="Add habit..."
-                    placeholderTextColor={palette.mutedInk}
-                    style={styles.minimalInput}
-                  />
-                  <Pressable style={styles.minimalAddButton} onPress={addHabitFromFocus}>
-                    <Text style={styles.minimalAddText}>+</Text>
-                  </Pressable>
-                </View>
+              <View style={styles.minimalAddRow}>
+                <TextInput
+                  value={habitDraft}
+                  onChangeText={setHabitDraft}
+                  placeholder="Add habit..."
+                  placeholderTextColor={palette.mutedInk}
+                  style={styles.minimalInput}
+                />
+                <Pressable style={styles.minimalAddButton} onPress={addHabitFromFocus}>
+                  <Text style={styles.minimalAddText}>+</Text>
+                </Pressable>
+              </View>
 
-                {habitItems.length > 0 ? (
-                  <View style={styles.habitCardColumn}>
-                    {habitItems.map((item) => {
-                      const weekDone = weekDays.filter((dayKey) => isHabitDoneOnDate(item.id, dayKey)).length;
-                      const done = isDone(item);
+              <View style={styles.focusTopPanel}>
+                <View style={styles.focusTopLeft}>
+                  <Text style={styles.focusPanelTitle}>{selectedHabit ? selectedHabit.title : "Pick a habit"}</Text>
+                  <Text style={styles.focusPanelMeta}>
+                    {selectedHabit ? `${selectedHabitWeekDone}/7 this week` : "No habit selected"}
+                  </Text>
+                  <View style={styles.focusMiniWeekRow}>
+                    {weekDays.map((dayKey) => {
+                      const checked = selectedHabit ? isHabitDoneOnDate(selectedHabit.id, dayKey) : false;
                       return (
-                        <Pressable
-                          key={item.id}
-                          style={[styles.habitMiniCard, selectedHabitId === item.id && styles.habitMiniCardActive]}
-                          onPress={() => setSelectedHabitId(item.id)}
+                        <View
+                          key={`selected-mini-${dayKey}`}
+                          style={[styles.focusMiniWeekCell, checked && styles.focusMiniWeekCellDone]}
                         >
-                          <Text style={styles.habitMiniTitle}>{item.title}</Text>
-                          <Text style={styles.habitMiniMeta}>
-                            {weekDone}/7 week {done ? "| done today" : ""}
+                          <Text style={styles.focusMiniWeekText}>
+                            {parseDateKey(dayKey).toLocaleDateString(undefined, { weekday: "narrow" })}
                           </Text>
-                          <View style={styles.sparkRow}>
-                            {weekDays.map((dayKey) => {
-                              const dayDone = isHabitDoneOnDate(item.id, dayKey);
-                              return (
-                                <View
-                                  key={`${item.id}-${dayKey}`}
-                                  style={[styles.sparkBar, dayDone ? styles.sparkBarOn : styles.sparkBarOff]}
-                                />
-                              );
-                            })}
-                          </View>
-                        </Pressable>
+                        </View>
                       );
                     })}
                   </View>
-                ) : null}
+                  <Text style={styles.focusCountText}>
+                    {habitItems.length === 0 ? "No habits yet" : `${habitsDoneToday}/${habitItems.length} done today`}
+                  </Text>
+                </View>
+                <View style={styles.focusTopRight}>
+                  <Text style={styles.focusPanelMeta}>Trend</Text>
+                  <View style={styles.focusTopGraphRow}>
+                    {selectedHabitTrend.map((day) => (
+                      <View
+                        key={`top-graph-${day.key}`}
+                        style={[
+                          styles.focusTopGraphBar,
+                          day.done ? styles.focusTopGraphBarDone : styles.focusTopGraphBarMiss
+                        ]}
+                      />
+                    ))}
+                  </View>
+                  <View style={styles.focusTopGraphLabelRow}>
+                    {selectedHabitTrend.slice(-7).map((day) => (
+                      <Text key={`top-graph-label-${day.key}`} style={styles.focusTopGraphLabel}>
+                        {day.dayLabel}
+                      </Text>
+                    ))}
+                  </View>
+                </View>
               </View>
 
               {selectedHabit ? (
-                <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>{selectedHabit.title} Graph</Text>
-                  <Text style={styles.mutedText}>{selectedHabitCompletedDays}/14 days completed</Text>
-                  <View style={styles.focusGraphRowCompact}>
-                    {selectedHabitTrend.map((day) => (
-                      <View key={day.key} style={styles.focusGraphCol}>
-                        <View
-                          style={[
-                            styles.focusGraphBar,
-                            day.done ? styles.focusGraphBarDone : styles.focusGraphBarMiss,
-                            { height: day.done ? 48 : 12 },
-                            day.isToday && styles.focusGraphBarToday
-                          ]}
-                        />
-                        <Text style={styles.focusGraphLabel}>{day.dayLabel}</Text>
-                      </View>
-                    ))}
-                  </View>
-                  <Text style={styles.mutedText}>
-                    This week: {selectedHabitWeekDone}/7
-                  </Text>
+                <View style={styles.focusHeatCard}>
+                  <Text style={styles.focusHeatTitle}>{selectedHabit.title}</Text>
+                  <Text style={styles.focusHeatMeta}>Last 5 weeks</Text>
                   <View style={styles.heatmapWrap}>
                     {heatmapWeeks.map((week, weekIndex) => (
                       <View key={`week-${weekIndex}`} style={styles.heatmapCol}>
@@ -448,10 +439,9 @@ export default function App(): React.JSX.Element {
                 </View>
               ) : null}
 
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>Weekly Table</Text>
+              <View style={styles.focusTableCard}>
                 <View style={styles.weekTableHeader}>
-                  <Text style={styles.weekTableHabitHeader}>Habit</Text>
+                  <Text style={styles.weekTableHabitHeader}>Habits</Text>
                   {weekLabels.map((label, index) => (
                     <Text key={`head-${weekDays[index]}`} style={styles.weekTableDayHeader}>
                       {label}
@@ -462,11 +452,17 @@ export default function App(): React.JSX.Element {
                   <Text style={styles.mutedText}>No habits yet.</Text>
                 ) : (
                   habitItems.map((item) => {
-                    const doneToday = isDone(item);
                     return (
                       <View key={`table-${item.id}`} style={styles.weekTableRow}>
                         <Pressable style={styles.weekTableHabitCell} onPress={() => setSelectedHabitId(item.id)}>
-                          <Text style={styles.weekTableHabitText}>{item.title}</Text>
+                          <Text
+                            style={[
+                              styles.weekTableHabitText,
+                              selectedHabitId === item.id && styles.weekTableHabitTextActive
+                            ]}
+                          >
+                            {item.title}
+                          </Text>
                         </Pressable>
                         {weekDays.map((dayKey) => {
                           const checked = isHabitDoneOnDate(item.id, dayKey);
@@ -484,14 +480,11 @@ export default function App(): React.JSX.Element {
                               }}
                             >
                               <Text style={[styles.weekTableTickText, checked && styles.weekTableTickTextOn]}>
-                                {checked ? "✓" : isToday ? "•" : "x"}
+                                {checked ? "v" : "x"}
                               </Text>
                             </Pressable>
                           );
                         })}
-                        <View style={[styles.weekTableTodayTag, doneToday && styles.weekTableTodayTagOn]}>
-                          <Text style={styles.weekTableTodayTagText}>{doneToday ? "DONE" : "PEND"}</Text>
-                        </View>
                       </View>
                     );
                   })
@@ -767,6 +760,17 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     paddingBottom: spacing.xl
   },
+  focusHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
+  focusPageTitle: {
+    color: palette.ink,
+    fontSize: 24,
+    fontFamily: fonts.headline,
+    letterSpacing: 1
+  },
   compactSwitchButton: {
     alignSelf: "flex-start",
     borderRadius: 12,
@@ -781,6 +785,118 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
     fontSize: typeScale.caption,
     letterSpacing: 0.5
+  },
+  focusTopPanel: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: palette.outline,
+    backgroundColor: "rgba(10, 16, 31, 0.92)",
+    padding: spacing.md,
+    flexDirection: "row",
+    gap: spacing.sm
+  },
+  focusTopLeft: {
+    flex: 1
+  },
+  focusTopRight: {
+    width: 132,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: palette.outline,
+    backgroundColor: "rgba(18, 27, 46, 0.85)",
+    padding: spacing.sm
+  },
+  focusPanelTitle: {
+    color: palette.ink,
+    fontFamily: fonts.body,
+    fontSize: 18
+  },
+  focusPanelMeta: {
+    marginTop: 4,
+    color: palette.mutedInk,
+    fontFamily: fonts.body,
+    fontSize: typeScale.caption
+  },
+  focusMiniWeekRow: {
+    marginTop: spacing.sm,
+    flexDirection: "row",
+    gap: 6
+  },
+  focusMiniWeekCell: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: palette.outline,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(24, 34, 58, 0.5)"
+  },
+  focusMiniWeekCellDone: {
+    borderColor: palette.success,
+    backgroundColor: "rgba(88, 247, 165, 0.2)"
+  },
+  focusMiniWeekText: {
+    color: palette.mutedInk,
+    fontFamily: fonts.body,
+    fontSize: 10
+  },
+  focusTopGraphRow: {
+    marginTop: spacing.sm,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between"
+  },
+  focusTopGraphBar: {
+    width: 7,
+    borderRadius: 3,
+    borderWidth: 1
+  },
+  focusTopGraphBarDone: {
+    height: 34,
+    borderColor: palette.neonCyan,
+    backgroundColor: "rgba(71, 244, 231, 0.65)"
+  },
+  focusTopGraphBarMiss: {
+    height: 10,
+    borderColor: palette.outline,
+    backgroundColor: "rgba(34, 50, 81, 0.45)"
+  },
+  focusTopGraphLabelRow: {
+    marginTop: spacing.xs,
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+  focusTopGraphLabel: {
+    color: palette.mutedInk,
+    fontFamily: fonts.body,
+    fontSize: 9
+  },
+  focusHeatCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: palette.outline,
+    backgroundColor: "rgba(10, 16, 31, 0.92)",
+    padding: spacing.md,
+    gap: spacing.xs
+  },
+  focusHeatTitle: {
+    color: palette.ink,
+    fontFamily: fonts.body,
+    fontSize: 15
+  },
+  focusHeatMeta: {
+    color: palette.mutedInk,
+    fontFamily: fonts.body,
+    fontSize: typeScale.caption
+  },
+  focusTableCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: palette.outline,
+    backgroundColor: "rgba(10, 16, 31, 0.92)",
+    padding: spacing.md,
+    gap: spacing.xs
   },
   heroCard: {
     borderRadius: 18,
@@ -1288,6 +1404,9 @@ const styles = StyleSheet.create({
     color: palette.ink,
     fontFamily: fonts.body,
     fontSize: typeScale.caption
+  },
+  weekTableHabitTextActive: {
+    color: palette.neonCyan
   },
   weekTableTick: {
     width: 28,
