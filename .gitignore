@@ -5,8 +5,10 @@ __pycache__/
 
 # Virtual environments
 venv/
+.env
 .env/
 .venv/
+.venv311/
 
 # IDEs
 .vscode/

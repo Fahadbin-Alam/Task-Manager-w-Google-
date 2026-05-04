@@ -1,0 +1,92 @@
+<!-- Author: Fahadbin Alam (fma52), 4/23/26 -->
+<!-- Mod by Codex, 4/23/26 -->
+<!-- From One World Relief projects page, 4/23/26 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One World Relief | Projects</title>
+  <meta
+    name="description"
+    content="See active and completed One World Relief projects for wells, orphan support, and humanitarian response."
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="one-world-relief.css" />
+</head>
+<body class="site-body">
+  <div class="background-shape background-shape-top" aria-hidden="true"></div>
+  <div class="background-shape background-shape-bottom" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-wrap">
+      <a href="index.html" class="brand" aria-label="One World Relief Home">
+        <span class="brand-mark">OWR</span>
+        <span class="brand-text">One World Relief</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="projects.html">Projects</a>
+        <a href="about.html">About</a>
+        <a href="donate.html">Donate</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a class="button button-primary header-cta" href="donate.html">Donate</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero reveal">
+      <div class="container page-hero-content">
+        <p class="eyebrow">Projects</p>
+        <h1>See where donations go.</h1>
+        <p class="lead">
+          Follow completed work, active campaigns, photos, videos, and donor updates in one place.
+        </p>
+      </div>
+    </section>
+
+    <section class="container section reveal">
+      <div class="section-heading">
+        <p class="eyebrow">Categories</p>
+        <h2>Clear giving categories</h2>
+      </div>
+      <div class="category-row">
+        <span>Wells</span>
+        <span>Orphan Support</span>
+        <span>Feeding</span>
+        <span>Future Projects</span>
+        <span>Current Needs</span>
+      </div>
+    </section>
+
+    <section class="container section reveal">
+      <div class="section-heading">
+        <p class="eyebrow">Impact Board</p>
+        <h2>Latest work and current campaigns</h2>
+        <div id="projectStats" class="project-stats" aria-live="polite"></div>
+      </div>
+      <div id="projectBoard" class="project-grid" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bar">
+      <p>One World Relief</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="donate.html">Donate</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="project-data.js"></script>
+  <script src="one-world-relief.js"></script>
+</body>
+</html>

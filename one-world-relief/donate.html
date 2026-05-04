@@ -1,0 +1,179 @@
+<!-- Author: Fahadbin Alam (fma52), 4/23/26 -->
+<!-- Mod by Codex, 4/23/26 -->
+<!-- From One World Relief donate page, 4/23/26 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One World Relief | Donate</title>
+  <meta
+    name="description"
+    content="Donate to One World Relief across regular giving, orphan support, wells, zakat, and feeding."
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="one-world-relief.css" />
+</head>
+<body class="site-body">
+  <div class="background-shape background-shape-top" aria-hidden="true"></div>
+  <div class="background-shape background-shape-bottom" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-wrap">
+      <a href="index.html" class="brand" aria-label="One World Relief Home">
+        <span class="brand-mark">OWR</span>
+        <span class="brand-text">One World Relief</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="projects.html">Projects</a>
+        <a href="about.html">About</a>
+        <a href="donate.html">Donate</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a class="button button-primary header-cta" href="donate.html">Donate</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero reveal">
+      <div class="container page-hero-content">
+        <p class="eyebrow">Donate</p>
+        <h1>Give securely through Stripe.</h1>
+        <p class="lead">Choose a category, enter your donor details, and continue to hosted checkout.</p>
+      </div>
+    </section>
+
+    <section class="container section reveal">
+      <div class="donation-categories">
+        <article class="donation-card">
+          <h3>Regular Donation</h3>
+          <p>General giving for where support is needed most.</p>
+          <a class="button button-primary" href="donate.html?campaign=General%20Fund#donationForm">Donate</a>
+        </article>
+        <article class="donation-card">
+          <h3>Orphan Support</h3>
+          <p>Help fund care, essentials, and educational support for children.</p>
+          <a class="button button-primary" href="donate.html?campaign=Orphan%20Support#donationForm">Donate</a>
+        </article>
+        <article class="donation-card">
+          <h3>Wells</h3>
+          <p>Support clean water access and well construction projects.</p>
+          <a class="button button-primary" href="donate.html?campaign=Wells#donationForm">Donate</a>
+        </article>
+        <article class="donation-card">
+          <h3>Zakat</h3>
+          <p>Give zakat through a category that can be tracked and organized clearly.</p>
+          <a class="button button-primary" href="donate.html?campaign=Zakat#donationForm">Donate</a>
+        </article>
+        <article class="donation-card">
+          <h3>Feeding</h3>
+          <p>Fund meal support, food packs, and emergency feeding campaigns.</p>
+          <a class="button button-primary" href="donate.html?campaign=Feeding#donationForm">Donate</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="container section reveal">
+      <div class="section-heading">
+        <p class="eyebrow">Direct Giving</p>
+        <h2>Donation form</h2>
+      </div>
+      <div class="donation-layout">
+        <article class="donation-card">
+          <h3>Donation Details</h3>
+          <form id="donationForm">
+            <label class="custom-amount" for="donorName">
+              Full name
+              <input id="donorName" type="text" placeholder="Your full name" required />
+            </label>
+
+            <label class="custom-amount" for="donorEmail">
+              Email
+              <input id="donorEmail" type="email" placeholder="you@example.com" required />
+            </label>
+
+            <label class="custom-amount" for="campaignSelect">
+              Donation type
+              <select id="campaignSelect" required>
+                <option value="General Fund">Regular Donation</option>
+                <option value="Orphan Support">Orphan Support</option>
+                <option value="Wells">Wells</option>
+                <option value="Zakat">Zakat</option>
+                <option value="Feeding">Feeding</option>
+              </select>
+            </label>
+
+            <fieldset class="amount-grid">
+              <legend>Select or enter a donation amount</legend>
+              <label><input type="radio" name="amount" value="10" checked />$10</label>
+              <label><input type="radio" name="amount" value="25" />$25</label>
+              <label><input type="radio" name="amount" value="50" />$50</label>
+              <label><input type="radio" name="amount" value="100" />$100</label>
+            </fieldset>
+
+            <label class="custom-amount" for="customDonation">
+              Custom amount
+              <input id="customDonation" type="number" min="1" step="1" placeholder="Enter amount in USD" />
+            </label>
+
+            <label class="custom-amount" for="paymentMethod">
+              Payment method
+              <select id="paymentMethod" required>
+                <option value="stripe">Stripe</option>
+                <option value="credit_card">Credit Card</option>
+                <option value="paypal">PayPal</option>
+              </select>
+            </label>
+
+            <div class="payments" aria-label="Supported payment methods">
+              <span>Visa</span>
+              <span>Mastercard</span>
+              <span>PayPal</span>
+              <span>Stripe</span>
+            </div>
+
+            <button class="button button-primary donate-button" type="submit">Complete Donation</button>
+            <p class="donation-note">
+              Card payments are handled by Stripe Checkout. One World Relief does not store card numbers.
+            </p>
+            <p class="donation-status" id="donationStatus" aria-live="polite"></p>
+          </form>
+        </article>
+
+        <article class="donation-card donation-benefits">
+          <h3>What your donation supports</h3>
+          <ul>
+            <li><strong>$10</strong> helps fund a basic family support need.</li>
+            <li><strong>$25</strong> supports essentials for a child or household.</li>
+            <li><strong>$50</strong> helps fund part of a relief or feeding campaign.</li>
+            <li><strong>$100</strong> contributes toward larger community projects like wells.</li>
+          </ul>
+          <div class="secure-note">
+            <strong>Secure checkout</strong>
+            <p>After submitting, donors are redirected to Stripe or PayPal depending on the selected payment method.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bar">
+      <p>One World Relief</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="one-world-relief.js"></script>
+</body>
+</html>

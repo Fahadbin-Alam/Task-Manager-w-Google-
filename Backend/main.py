@@ -21,14 +21,22 @@ import hashlib
 import requests
 from jose import JWTError, jwt
 
-# ===== CONFIG =====
-SECRET_KEY = "your-secret-key-change-in-production"
-ALGORITHM = "HS256"
-TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    load_dotenv = None
 
 # ===== PATHS =====
 BASE_DIR = Path(__file__).resolve().parent
-DB_PATH = BASE_DIR / "app.db"
+if load_dotenv:
+    load_dotenv(BASE_DIR.parent / ".env")
+
+# ===== CONFIG =====
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production").strip()
+ALGORITHM = "HS256"
+TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
+
+DB_PATH = Path(os.getenv("DB_PATH", str(BASE_DIR / "app.db"))).resolve()
 OWR_DIR = BASE_DIR.parent / "one-world-relief"
 
 # ===== ONE WORLD RELIEF CONFIG =====
@@ -784,6 +792,7 @@ def create_stripe_checkout_session(
     amount_cents: int,
     donor_email: str,
     donor_name: str,
+    campaign: Optional[str],
     success_url: str,
     cancel_url: str,
 ) -> Dict[str, Any]:
@@ -798,11 +807,16 @@ def create_stripe_checkout_session(
         "success_url": f"{success_url}?donation_id={donation_id}&session_id={{CHECKOUT_SESSION_ID}}",
         "cancel_url": f"{cancel_url}?donation_id={donation_id}",
         "customer_email": donor_email,
+        "client_reference_id": str(donation_id),
         "metadata[donation_id]": str(donation_id),
         "metadata[source]": "one-world-relief",
+        "metadata[campaign]": campaign or "General Fund",
+        "payment_intent_data[metadata][donation_id]": str(donation_id),
+        "payment_intent_data[metadata][source]": "one-world-relief",
+        "payment_intent_data[metadata][campaign]": campaign or "General Fund",
         "line_items[0][quantity]": "1",
         "line_items[0][price_data][currency]": "usd",
-        "line_items[0][price_data][product_data][name]": "One World Relief Donation",
+        "line_items[0][price_data][product_data][name]": f"One World Relief - {campaign or 'General Fund'}",
         "line_items[0][price_data][product_data][description]": f"Donation from {donor_name}",
         "line_items[0][price_data][unit_amount]": str(amount_cents),
     }
@@ -810,6 +824,7 @@ def create_stripe_checkout_session(
     response = requests.post(
         "https://api.stripe.com/v1/checkout/sessions",
         data=data,
+        headers={"Stripe-Version": "2026-02-25.clover"},
         auth=(OWR_STRIPE_SECRET_KEY, ""),
         timeout=20,
     )
@@ -1026,7 +1041,72 @@ def read_charity_asset(filename: str) -> str:
 
 @app.get("/charity", response_class=HTMLResponse)
 def charity_home():
-    return read_charity_asset("one-world-relief.html")
+    return read_charity_asset("index.html")
+
+
+@app.get("/charity/index.html", response_class=HTMLResponse)
+def charity_nested_index_page():
+    return read_charity_asset("index.html")
+
+
+@app.get("/charity/about.html", response_class=HTMLResponse)
+def charity_nested_about_page():
+    return read_charity_asset("about.html")
+
+
+@app.get("/charity/projects.html", response_class=HTMLResponse)
+def charity_nested_projects_page():
+    return read_charity_asset("projects.html")
+
+
+@app.get("/charity/donate.html", response_class=HTMLResponse)
+def charity_nested_donate_page():
+    return read_charity_asset("donate.html")
+
+
+@app.get("/charity/contact.html", response_class=HTMLResponse)
+def charity_nested_contact_page():
+    return read_charity_asset("contact.html")
+
+
+@app.get("/charity/one-world-relief.css", response_class=PlainTextResponse)
+def charity_nested_css():
+    return PlainTextResponse(read_charity_asset("one-world-relief.css"), media_type="text/css")
+
+
+@app.get("/charity/one-world-relief.js", response_class=PlainTextResponse)
+def charity_nested_js():
+    return PlainTextResponse(read_charity_asset("one-world-relief.js"), media_type="application/javascript")
+
+
+@app.get("/charity/project-data.js", response_class=PlainTextResponse)
+def charity_nested_project_data():
+    return PlainTextResponse(read_charity_asset("project-data.js"), media_type="application/javascript")
+
+
+@app.get("/about.html", response_class=HTMLResponse)
+def charity_about_page():
+    return read_charity_asset("about.html")
+
+
+@app.get("/index.html", response_class=HTMLResponse)
+def charity_index_page():
+    return read_charity_asset("index.html")
+
+
+@app.get("/projects.html", response_class=HTMLResponse)
+def charity_projects_page():
+    return read_charity_asset("projects.html")
+
+
+@app.get("/donate.html", response_class=HTMLResponse)
+def charity_donate_page():
+    return read_charity_asset("donate.html")
+
+
+@app.get("/contact.html", response_class=HTMLResponse)
+def charity_contact_page():
+    return read_charity_asset("contact.html")
 
 
 @app.get("/one-world-relief.css", response_class=PlainTextResponse)
@@ -1037,6 +1117,11 @@ def charity_css():
 @app.get("/one-world-relief.js", response_class=PlainTextResponse)
 def charity_js():
     return PlainTextResponse(read_charity_asset("one-world-relief.js"), media_type="application/javascript")
+
+
+@app.get("/project-data.js", response_class=PlainTextResponse)
+def charity_project_data():
+    return PlainTextResponse(read_charity_asset("project-data.js"), media_type="application/javascript")
 
 
 @app.get("/charity/thank-you", response_class=HTMLResponse)
@@ -1208,6 +1293,7 @@ def create_charity_checkout(req: DonationCheckoutRequest):
             amount_cents=amount_cents,
             donor_email=str(req.donor_email),
             donor_name=req.donor_name,
+            campaign=req.campaign,
             success_url=success_url,
             cancel_url=cancel_url,
         )

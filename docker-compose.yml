@@ -1,0 +1,25 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: student-guide-app
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-change-me-for-real-use}
+      DB_PATH: ${DB_PATH:-/app/data/app.db}
+      OWR_STRIPE_SECRET_KEY: ${OWR_STRIPE_SECRET_KEY:-}
+      OWR_STRIPE_WEBHOOK_SECRET: ${OWR_STRIPE_WEBHOOK_SECRET:-}
+      OWR_SUCCESS_URL: ${OWR_SUCCESS_URL:-http://localhost:8000/charity/thank-you}
+      OWR_CANCEL_URL: ${OWR_CANCEL_URL:-http://localhost:8000/charity/cancelled}
+      OWR_PAYPAL_CLIENT_ID: ${OWR_PAYPAL_CLIENT_ID:-}
+      OWR_PAYPAL_CLIENT_SECRET: ${OWR_PAYPAL_CLIENT_SECRET:-}
+      OWR_PAYPAL_BASE_URL: ${OWR_PAYPAL_BASE_URL:-https://api-m.sandbox.paypal.com}
+      OWR_ADMIN_API_KEY: ${OWR_ADMIN_API_KEY:-}
+    volumes:
+      - student_guide_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  student_guide_data:

@@ -1,15 +1,15 @@
 <!-- Author: Fahadbin Alam (fma52), 4/19/26 -->
-<!-- Mod by Codex, 4/19/26 -->
-<!-- From Charity Board for Students issue, 4/19/26 -->
+<!-- Mod by Codex, 4/23/26 -->
+<!-- From One World Relief multi-page landing page refresh, 4/23/26 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>One World Relief | Help Orphans, Build Wells, Restore Communities</title>
+  <title>One World Relief | Donate</title>
   <meta
     name="description"
-    content="One World Relief is a nonprofit helping families in need through orphan support, clean water well construction, and emergency relief."
+    content="Donate to One World Relief for clean water, orphan support, food campaigns, zakat, and urgent humanitarian support."
   />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
@@ -19,346 +19,83 @@
   />
   <link rel="stylesheet" href="one-world-relief.css" />
 </head>
-<body>
+<body class="site-body">
   <div class="background-shape background-shape-top" aria-hidden="true"></div>
   <div class="background-shape background-shape-bottom" aria-hidden="true"></div>
 
   <header class="site-header">
     <div class="container header-wrap">
-      <a href="#top" class="brand" aria-label="One World Relief Home">
+      <a href="index.html" class="brand" aria-label="One World Relief Home">
         <span class="brand-mark">OWR</span>
         <span class="brand-text">One World Relief</span>
       </a>
       <nav class="main-nav" aria-label="Main navigation">
-        <a href="#mission">Mission</a>
-        <a href="#programs">Programs</a>
-        <a href="#donate">Donate</a>
-        <a href="#transparency">Transparency</a>
-        <a href="#contact">Contact</a>
+        <a href="projects.html">Projects</a>
+        <a href="about.html">About</a>
+        <a href="donate.html">Donate</a>
+        <a href="contact.html">Contact</a>
       </nav>
-      <a class="button button-primary header-cta" href="#donate">Donate Now</a>
+      <a class="button button-primary header-cta" href="donate.html">Donate</a>
     </div>
   </header>
 
-  <main id="top">
-    <section class="hero-shell reveal">
-      <div class="container hero">
+  <main>
+    <section class="hero-shell hero-shell-home reveal">
+      <div class="container hero hero-home hero-donate-first">
         <div class="hero-copy">
-          <p class="eyebrow">Student-Led Relief Campaign</p>
-          <h1>One World Relief turns fast generosity into food, water, shelter, and hope.</h1>
+          <p class="eyebrow">One World Relief</p>
+          <h1>Donate today.</h1>
           <p class="lead">
-            This charity page is built to feel urgent, human, and trustworthy. We support orphan care,
-            clean water projects, and emergency relief with a donation journey that feels modern and easy
-            to act on.
+            Choose an amount, pick where it should go, and continue to the secure donation form.
           </p>
-          <div class="hero-actions">
-            <a href="https://buy.stripe.com/YOUR_LINK" target="_blank" rel="noreferrer">
-              <button class="button button-primary" type="button">Donate Now</button>
-            </a>
-            <a class="button button-outline" href="#programs">See Programs</a>
-          </div>
-          <div class="hero-proof">
-            <div>
-              <strong>4,380</strong>
-              <span>students and children supported</span>
-            </div>
-            <div>
-              <strong>212</strong>
-              <span>wells built or repaired</span>
-            </div>
-            <div>
-              <strong>97%</strong>
-              <span>directed to program impact</span>
-            </div>
-          </div>
         </div>
 
-        <aside class="hero-rail">
-          <article class="video-card">
-            <p class="eyebrow">Featured Story</p>
-            <h2>Watch the mission in action</h2>
-            <p>
-              Add your future YouTube story, fundraiser video, or field update here so visitors can see
-              the real-world impact before they donate.
-            </p>
-            <a
-              class="button button-video"
-              href="https://www.youtube.com/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Watch on YouTube
-            </a>
-          </article>
+        <form class="quick-donation" id="quickDonationForm" aria-label="Start a donation">
+          <fieldset class="quick-amounts">
+            <legend>Amount</legend>
+            <label><input type="radio" name="quickAmount" value="10" />$10</label>
+            <label><input type="radio" name="quickAmount" value="25" checked />$25</label>
+            <label><input type="radio" name="quickAmount" value="50" />$50</label>
+            <label><input type="radio" name="quickAmount" value="100" />$100</label>
+          </fieldset>
 
-          <article class="impact-panel">
-            <h2>2026 Impact Snapshot</h2>
-            <ul>
-              <li>
-                <strong>Emergency Meals</strong>
-                <span>Rapid-response food packs delivered during shortages and conflict.</span>
-              </li>
-              <li>
-                <strong>Water Access</strong>
-                <span>Safe daily water routes restored through wells, pumps, and repairs.</span>
-              </li>
-              <li>
-                <strong>Student Relief</strong>
-                <span>Orphan care support covering school, essentials, and protective services.</span>
-              </li>
-            </ul>
-          </article>
-        </aside>
-      </div>
+          <label class="quick-category" for="quickCampaign">
+            Donation type
+            <select id="quickCampaign" name="quickCampaign">
+              <option value="General Fund">Regular Donation</option>
+              <option value="Orphan Support">Orphan Support</option>
+              <option value="Wells">Wells</option>
+              <option value="Zakat">Zakat</option>
+              <option value="Feeding">Feeding</option>
+            </select>
+          </label>
 
-      <div class="impact-marquee" aria-label="Impact highlights">
-        <div class="impact-track">
-          <span>Gaza family food packs</span>
-          <span>Village water wells</span>
-          <span>Orphan education support</span>
-          <span>Emergency shelter kits</span>
-          <span>Medical relief supplies</span>
-          <span>Volunteer-led campaigns</span>
-          <span>Gaza family food packs</span>
-          <span>Village water wells</span>
-          <span>Orphan education support</span>
-          <span>Emergency shelter kits</span>
-          <span>Medical relief supplies</span>
-          <span>Volunteer-led campaigns</span>
-        </div>
+          <button class="button button-primary quick-donation-button" type="submit">Start Donation</button>
+        </form>
       </div>
     </section>
 
-    <section class="container story-strip reveal" aria-label="Why donors trust this page">
-      <article class="story-card story-card-featured">
-        <p class="eyebrow">Why This Page Works</p>
-        <h2>Built to feel alive the moment someone lands here</h2>
-        <p>
-          The moving impact strip gives the homepage energy right away, like a live campaign instead of
-          a static school assignment. It helps visitors feel momentum before they even scroll.
-        </p>
-      </article>
-      <article class="story-card">
-        <h3>Fast Trust</h3>
-        <p>Clear numbers, strong headlines, and quick navigation reduce confusion and increase confidence.</p>
-      </article>
-      <article class="story-card">
-        <h3>Future Video Ready</h3>
-        <p>The top-right story card is already prepared for your YouTube link when you are ready to add it.</p>
-      </article>
-    </section>
-
-    <section id="mission" class="container section reveal">
-      <div class="section-heading">
-        <p class="eyebrow">Our Mission</p>
-        <h2>Compassion that reaches fast and stays for the long term</h2>
-      </div>
-      <div class="mission-grid">
-        <article class="card">
-          <h3>Support Orphans</h3>
-          <p>
-            We sponsor school costs, nutrition plans, and safe care centers so children can learn and
-            grow with dignity.
-          </p>
-        </article>
-        <article class="card">
-          <h3>Build Wells</h3>
-          <p>
-            We design and construct durable water wells, then train local teams for maintenance and
-            long-term reliability.
-          </p>
-        </article>
-        <article class="card">
-          <h3>Emergency Relief</h3>
-          <p>
-            We deliver urgent aid kits, clean water transport, and family shelter supplies during crises
-            and displacement.
-          </p>
-        </article>
-      </div>
-    </section>
-
-    <section id="programs" class="container section reveal">
-      <div class="section-heading">
-        <p class="eyebrow">Core Programs</p>
-        <h2>What we build with your support</h2>
-      </div>
-      <div class="program-grid">
-        <article class="program-card">
-          <h3>Orphan Futures Program</h3>
-          <p>
-            Monthly sponsorships fund tuition, uniforms, books, meals, and counseling for students in
-            underserved regions.
-          </p>
-          <ul>
-            <li>Education stipends and school kits</li>
-            <li>Medical screenings and mental health support</li>
-            <li>Guardian mentorship and family reunification services</li>
-          </ul>
-        </article>
-        <article class="program-card">
-          <h3>Clean Water Wells Program</h3>
-          <p>
-            We survey communities with severe water scarcity and install deep-source wells with purification
-            and hand-pump systems.
-          </p>
-          <ul>
-            <li>Water testing and site planning</li>
-            <li>Well construction and filtration systems</li>
-            <li>Local maintenance training for youth volunteers</li>
-          </ul>
-        </article>
-        <article class="program-card">
-          <h3>Rapid Relief Program</h3>
-          <p>
-            Our response teams provide short-notice support when conflict, flooding, or food insecurity
-            puts families at immediate risk.
-          </p>
-          <ul>
-            <li>Food and hygiene distributions</li>
-            <li>Temporary housing and safe shelter packs</li>
-            <li>Community rebuilding grants for schools and clinics</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <section id="donate" class="container section reveal">
-      <div class="section-heading">
-        <p class="eyebrow">Student Charity Board Ready</p>
-        <h2>Simple, secure donations for every supporter</h2>
-      </div>
-      <div class="donation-layout">
-        <article class="donation-card">
-          <h3>Choose an Amount</h3>
-          <form id="donationForm">
-            <label class="custom-amount" for="donorName">
-              Full name
-              <input id="donorName" type="text" placeholder="Your full name" required />
-            </label>
-
-            <label class="custom-amount" for="donorEmail">
-              Email
-              <input id="donorEmail" type="email" placeholder="you@example.com" required />
-            </label>
-
-            <fieldset class="amount-grid">
-              <legend>Select or enter a donation amount</legend>
-              <label><input type="radio" name="amount" value="10" checked />$10</label>
-              <label><input type="radio" name="amount" value="25" />$25</label>
-              <label><input type="radio" name="amount" value="50" />$50</label>
-              <label><input type="radio" name="amount" value="100" />$100</label>
-            </fieldset>
-
-            <label class="custom-amount" for="customDonation">
-              Custom amount
-              <input id="customDonation" type="number" min="1" step="1" placeholder="Enter amount in USD" />
-            </label>
-
-            <label class="custom-amount" for="paymentMethod">
-              Payment method
-              <select id="paymentMethod" required>
-                <option value="paypal">PayPal</option>
-                <option value="credit_card">Credit Card</option>
-                <option value="stripe">Stripe</option>
-              </select>
-            </label>
-
-            <div class="payments" aria-label="Supported payment methods">
-              <span>Visa</span>
-              <span>Mastercard</span>
-              <span>PayPal</span>
-              <span>Stripe</span>
-            </div>
-
-            <button class="button button-primary donate-button" type="submit">Complete Donation</button>
-            <p class="donation-note">
-              Confirmation appears immediately after payment and a donation record is emailed for reference.
-            </p>
-            <p class="donation-status" id="donationStatus" aria-live="polite"></p>
-          </form>
-        </article>
-
-        <article class="donation-card donation-benefits">
-          <h3>Where your donation goes</h3>
-          <ul>
-            <li><strong>$10</strong> provides clean water access for a family for one week.</li>
-            <li><strong>$25</strong> supplies school essentials for one orphaned student.</li>
-            <li><strong>$50</strong> funds emergency food kits for two households.</li>
-            <li><strong>$100</strong> supports drilling materials for new community wells.</li>
-          </ul>
-          <p>
-            Every donor receives secure processing, transparent receipts, and annual impact summaries to track
-            where support was used.
-          </p>
-        </article>
-      </div>
-    </section>
-
-    <section id="transparency" class="container section reveal">
-      <div class="section-heading">
-        <p class="eyebrow">Trust and Transparency</p>
-        <h2>Accountability is built into every campaign</h2>
-      </div>
-      <div class="transparency-grid">
-        <article class="card">
-          <h3>Program Spending</h3>
-          <p>97% of donations go directly to field programs. 3% supports secure operations and donor services.</p>
-        </article>
-        <article class="card">
-          <h3>Verified Reporting</h3>
-          <p>Quarterly project updates include beneficiary counts, project photos, and progress milestones.</p>
-        </article>
-        <article class="card">
-          <h3>Donor Records</h3>
-          <p>Receipts and donation history are stored for each supporter to review, download, and audit anytime.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="container section reveal">
-      <div class="section-heading">
-        <p class="eyebrow">Join the Movement</p>
-        <h2>Volunteer, partner, and build impact with us</h2>
-      </div>
-      <div class="cta-band">
-        <p>
-          One World Relief welcomes students, community leaders, and sponsors who want to make measurable
-          change in education, health, and water access.
-        </p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="#contact">Become a Volunteer</a>
-          <a class="button button-outline" href="#contact">Partner With Us</a>
-        </div>
-      </div>
+    <section class="container home-trust-row reveal" aria-label="Donation focus areas">
+      <span>Wells</span>
+      <span>Orphan Support</span>
+      <span>Zakat</span>
+      <span>Feeding</span>
+      <span>Emergency Relief</span>
     </section>
   </main>
 
-  <footer id="contact" class="site-footer reveal">
-    <div class="container footer-grid">
-      <div>
-        <h2>Contact One World Relief</h2>
-        <p>Email: contact@oneworldrelief.org</p>
-        <p>Phone: +1 (215) 555-0142</p>
-        <p>Headquarters: Philadelphia, PA</p>
+  <footer class="site-footer site-footer-minimal">
+    <div class="container footer-bar">
+      <p>One World Relief</p>
+      <div class="footer-links">
+        <a href="projects.html">Projects</a>
+        <a href="about.html">About</a>
+        <a href="donate.html">Donate</a>
+        <a href="contact.html">Contact</a>
       </div>
-      <form class="contact-form">
-        <label for="nameField">
-          Full Name
-          <input id="nameField" type="text" placeholder="Your full name" />
-        </label>
-        <label for="emailField">
-          Email Address
-          <input id="emailField" type="email" placeholder="your@email.com" />
-        </label>
-        <label for="messageField">
-          Message
-          <textarea id="messageField" rows="4" placeholder="How would you like to help?"></textarea>
-        </label>
-        <button class="button button-primary" type="button">Send Message</button>
-      </form>
     </div>
   </footer>
+
   <script src="one-world-relief.js"></script>
 </body>
 </html>
