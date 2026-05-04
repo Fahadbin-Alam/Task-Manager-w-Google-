@@ -16,7 +16,7 @@ import { connectGoogleCalendarMock, syncItemsToGoogleCalendar } from "./src/serv
 import { defaultState, loadState, saveState } from "./src/storage";
 import { fonts, palette, spacing, typeScale } from "./src/theme";
 import type { ItemKind, PersistedState, Priority, TaskItem } from "./src/types";
-import { formatDateKey } from "./src/utils/date";
+import { formatDateKey, lastNDays, parseDateKey } from "./src/utils/date";
 import {
   currentStreak,
   dailyCompletionCount,
@@ -43,6 +43,7 @@ export default function App(): React.JSX.Element {
   const [state, setState] = useState<PersistedState>(defaultState);
   const [isHydrated, setIsHydrated] = useState(false);
   const [activeScreen, setActiveScreen] = useState<"focus" | "dashboard">("focus");
+  const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
   const [titleDraft, setTitleDraft] = useState("");
   const [habitDraft, setHabitDraft] = useState("");
   const [kindDraft, setKindDraft] = useState<ItemKind>("task");
@@ -85,6 +86,11 @@ export default function App(): React.JSX.Element {
     [state.items, missionFilter]
   );
   const habitItems = useMemo(() => state.items.filter((item) => item.kind === "habit"), [state.items]);
+  const trendDays = useMemo(() => lastNDays(14), [todayKey]);
+  const selectedHabit = useMemo(
+    () => habitItems.find((item) => item.id === selectedHabitId) ?? null,
+    [habitItems, selectedHabitId]
+  );
   const habitsDoneToday = useMemo(
     () =>
       habitItems.filter((item) =>
@@ -92,6 +98,31 @@ export default function App(): React.JSX.Element {
       ).length,
     [habitItems, state.completions, todayKey]
   );
+  const selectedHabitTrend = useMemo(() => {
+    if (!selectedHabit) return [];
+    return trendDays.map((dayKey) => {
+      const done = state.completions.some(
+        (entry) => entry.itemId === selectedHabit.id && entry.dateKey === dayKey
+      );
+      return {
+        key: dayKey,
+        done,
+        dayLabel: parseDateKey(dayKey).toLocaleDateString(undefined, { weekday: "narrow" }),
+        isToday: dayKey === todayKey
+      };
+    });
+  }, [selectedHabit, trendDays, state.completions, todayKey]);
+  const selectedHabitCompletedDays = selectedHabitTrend.filter((day) => day.done).length;
+
+  useEffect(() => {
+    if (habitItems.length === 0) {
+      setSelectedHabitId(null);
+      return;
+    }
+    if (!selectedHabitId || !habitItems.some((item) => item.id === selectedHabitId)) {
+      setSelectedHabitId(habitItems[0].id);
+    }
+  }, [habitItems, selectedHabitId]);
 
   function isDone(item: TaskItem): boolean {
     if (item.kind === "task") return item.oneOffDone;
@@ -285,19 +316,6 @@ export default function App(): React.JSX.Element {
       <StatusBar style="light" />
       <SafeAreaView style={styles.safe}>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.screenSwitchRow}>
-            <ScreenSwitchButton
-              label="Habit Focus"
-              active={activeScreen === "focus"}
-              onPress={() => setActiveScreen("focus")}
-            />
-            <ScreenSwitchButton
-              label="Dashboard"
-              active={activeScreen === "dashboard"}
-              onPress={() => setActiveScreen("dashboard")}
-            />
-          </View>
-
           {activeScreen === "focus" ? (
             <>
               <View style={styles.heroCard}>
@@ -307,6 +325,9 @@ export default function App(): React.JSX.Element {
                 <Text style={styles.focusCountText}>
                   {habitItems.length === 0 ? "No habits yet" : `${habitsDoneToday}/${habitItems.length} done today`}
                 </Text>
+                <Pressable style={styles.compactSwitchButton} onPress={() => setActiveScreen("dashboard")}>
+                  <Text style={styles.compactSwitchText}>Open Dashboard</Text>
+                </Pressable>
               </View>
 
               <View style={styles.card}>
@@ -331,23 +352,54 @@ export default function App(): React.JSX.Element {
                   habitItems.map((item) => {
                     const done = isDone(item);
                     return (
-                      <Pressable
-                        key={item.id}
-                        style={[styles.focusHabitRow, done && styles.focusHabitRowDone]}
-                        onPress={() => toggleMission(item)}
-                      >
-                        <Text style={styles.focusHabitTitle}>{item.title}</Text>
-                        <View style={[styles.focusCheckPill, done && styles.focusCheckPillDone]}>
+                      <View key={item.id} style={[styles.focusHabitRow, done && styles.focusHabitRowDone]}>
+                        <Pressable style={styles.focusHabitInfo} onPress={() => setSelectedHabitId(item.id)}>
+                          <Text style={styles.focusHabitTitle}>{item.title}</Text>
+                          <Text style={styles.focusHabitHint}>
+                            {selectedHabitId === item.id ? "Showing graph below" : "Tap to view graph"}
+                          </Text>
+                        </Pressable>
+                        <Pressable
+                          style={[styles.focusCheckPill, done && styles.focusCheckPillDone]}
+                          onPress={() => toggleMission(item)}
+                        >
                           <Text style={styles.focusCheckText}>{done ? "DONE" : "CHECK"}</Text>
-                        </View>
-                      </Pressable>
+                        </Pressable>
+                      </View>
                     );
                   })
                 )}
               </View>
+
+              {selectedHabit ? (
+                <View style={styles.card}>
+                  <Text style={styles.sectionTitle}>{selectedHabit.title} Trend</Text>
+                  <Text style={styles.mutedText}>
+                    {selectedHabitCompletedDays}/14 days completed
+                  </Text>
+                  <View style={styles.focusGraphRow}>
+                    {selectedHabitTrend.map((day) => (
+                      <View key={day.key} style={styles.focusGraphCol}>
+                        <View
+                          style={[
+                            styles.focusGraphBar,
+                            day.done ? styles.focusGraphBarDone : styles.focusGraphBarMiss,
+                            { height: day.done ? 46 : 12 },
+                            day.isToday && styles.focusGraphBarToday
+                          ]}
+                        />
+                        <Text style={styles.focusGraphLabel}>{day.dayLabel}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              ) : null}
             </>
           ) : (
             <>
+              <Pressable style={styles.compactSwitchButton} onPress={() => setActiveScreen("focus")}>
+                <Text style={styles.compactSwitchText}>Back To Habit Tracker</Text>
+              </Pressable>
               <View style={styles.heroCard}>
                 <Text style={styles.heroTag}>ANDROID MVP</Text>
                 <Text style={styles.heroTitle}>SHADOW TASK</Text>
@@ -562,26 +614,6 @@ function StatPill(props: { label: string; value: string }): React.JSX.Element {
   );
 }
 
-function ScreenSwitchButton(props: {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-}): React.JSX.Element {
-  return (
-    <Pressable
-      style={[
-        styles.screenSwitchButton,
-        props.active ? styles.screenSwitchButtonActive : styles.screenSwitchButtonIdle
-      ]}
-      onPress={props.onPress}
-    >
-      <Text style={[styles.screenSwitchText, props.active && styles.screenSwitchTextActive]}>
-        {props.label}
-      </Text>
-    </Pressable>
-  );
-}
-
 function ModeButton(props: { label: string; active: boolean; onPress: () => void }): React.JSX.Element {
   return (
     <Pressable
@@ -629,35 +661,23 @@ const styles = StyleSheet.create({
   content: {
     gap: spacing.md,
     paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
     paddingBottom: spacing.xl
   },
-  screenSwitchRow: {
-    marginTop: spacing.sm,
-    flexDirection: "row",
-    gap: spacing.sm
-  },
-  screenSwitchButton: {
-    flex: 1,
+  compactSwitchButton: {
+    alignSelf: "flex-start",
     borderRadius: 12,
     borderWidth: 1,
-    paddingVertical: spacing.sm,
-    alignItems: "center"
-  },
-  screenSwitchButtonActive: {
     borderColor: palette.neonCyan,
-    backgroundColor: "rgba(71, 244, 231, 0.2)"
+    backgroundColor: "rgba(71, 244, 231, 0.14)",
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md
   },
-  screenSwitchButtonIdle: {
-    borderColor: palette.outline,
-    backgroundColor: "rgba(19, 27, 45, 0.6)"
-  },
-  screenSwitchText: {
-    color: palette.mutedInk,
+  compactSwitchText: {
+    color: palette.neonCyan,
     fontFamily: fonts.body,
-    fontSize: typeScale.body
-  },
-  screenSwitchTextActive: {
-    color: palette.ink
+    fontSize: typeScale.caption,
+    letterSpacing: 0.5
   },
   heroCard: {
     borderRadius: 18,
@@ -954,10 +974,18 @@ const styles = StyleSheet.create({
     borderColor: palette.success,
     backgroundColor: "rgba(88, 247, 165, 0.12)"
   },
+  focusHabitInfo: {
+    flex: 1
+  },
   focusHabitTitle: {
-    flex: 1,
     color: palette.ink,
     fontSize: typeScale.section,
+    fontFamily: fonts.body
+  },
+  focusHabitHint: {
+    marginTop: 2,
+    color: palette.mutedInk,
+    fontSize: typeScale.caption,
     fontFamily: fonts.body
   },
   focusCheckPill: {
@@ -977,6 +1005,39 @@ const styles = StyleSheet.create({
     fontFamily: fonts.headline,
     fontSize: typeScale.caption,
     letterSpacing: 1
+  },
+  focusGraphRow: {
+    marginTop: spacing.sm,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between"
+  },
+  focusGraphCol: {
+    width: 18,
+    alignItems: "center",
+    gap: 4
+  },
+  focusGraphBar: {
+    width: 14,
+    height: 46,
+    borderRadius: 8,
+    borderWidth: 1
+  },
+  focusGraphBarDone: {
+    borderColor: palette.success,
+    backgroundColor: "rgba(88, 247, 165, 0.7)"
+  },
+  focusGraphBarMiss: {
+    borderColor: palette.outline,
+    backgroundColor: "rgba(34, 50, 81, 0.4)"
+  },
+  focusGraphBarToday: {
+    borderColor: palette.neonCyan
+  },
+  focusGraphLabel: {
+    color: palette.mutedInk,
+    fontSize: 10,
+    fontFamily: fonts.body
   },
   weekWrap: {
     flexDirection: "row",
