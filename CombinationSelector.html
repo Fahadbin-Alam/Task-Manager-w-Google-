@@ -1,0 +1,118 @@
+// Example data – replace with real majors/minors from your backend later
+const AVAILABLE_MAJORS = [
+  { id: "cs", name: "Computer Science" },
+  { id: "se", name: "Software Engineering" },
+  { id: "ds", name: "Data Science" },
+  { id: "ee", name: "Electrical Engineering" }
+];
+
+const AVAILABLE_MINORS = [
+  { id: "math", name: "Mathematics" },
+  { id: "bus", name: "Business" },
+  { id: "phys", name: "Physics" }
+];
+
+// State object used by the requirements engine later
+const programSelection = {
+  mode: "single",      // "single" | "double" | "majorMinor"
+  singleMajor: null,   // major id
+  major1: null,        // major id
+  major2: null,        // major id
+  majorForMinor: null, // major id
+  minor: null          // minor id
+};
+
+function initProgramCombinationSelector() {
+  const modeSelect = document.getElementById("programMode");
+
+  const singleMajorContainer = document.getElementById("singleMajorContainer");
+  const doubleMajorContainer = document.getElementById("doubleMajorContainer");
+  const majorMinorContainer = document.getElementById("majorMinorContainer");
+
+  const singleMajorSelect = document.getElementById("singleMajorSelect");
+  const major1Select = document.getElementById("major1Select");
+  const major2Select = document.getElementById("major2Select");
+  const majorForMinorSelect = document.getElementById("majorForMinorSelect");
+  const minorSelect = document.getElementById("minorSelect");
+
+  const debugEl = document.getElementById("programSelectionDebug");
+
+  // Helper to populate a <select> with options
+  function populateSelect(selectEl, options, placeholder) {
+    selectEl.innerHTML = "";
+    const ph = document.createElement("option");
+    ph.value = "";
+    ph.textContent = placeholder;
+    ph.disabled = true;
+    ph.selected = true;
+    selectEl.appendChild(ph);
+
+    options.forEach(opt => {
+      const o = document.createElement("option");
+      o.value = opt.id;
+      o.textContent = opt.name;
+      selectEl.appendChild(o);
+    });
+  }
+
+  // Initial population
+  populateSelect(singleMajorSelect, AVAILABLE_MAJORS, "Select major");
+  populateSelect(major1Select, AVAILABLE_MAJORS, "Select major 1");
+  populateSelect(major2Select, AVAILABLE_MAJORS, "Select major 2");
+  populateSelect(majorForMinorSelect, AVAILABLE_MAJORS, "Select major");
+  populateSelect(minorSelect, AVAILABLE_MINORS, "Select minor");
+
+  function updateModeUI() {
+    const mode = modeSelect.value;
+    programSelection.mode = mode;
+
+    singleMajorContainer.style.display = mode === "single" ? "block" : "none";
+    doubleMajorContainer.style.display = mode === "double" ? "block" : "none";
+    majorMinorContainer.style.display = mode === "majorMinor" ? "block" : "none";
+
+    renderProgramSelectionDebug();
+  }
+
+  function renderProgramSelectionDebug() {
+    if (!debugEl) return;
+    debugEl.textContent = JSON.stringify(programSelection, null, 2);
+  }
+
+  // Event listeners
+  modeSelect.addEventListener("change", () => {
+    updateModeUI();
+  });
+
+  singleMajorSelect.addEventListener("change", () => {
+    programSelection.singleMajor = singleMajorSelect.value || null;
+    renderProgramSelectionDebug();
+  });
+
+  major1Select.addEventListener("change", () => {
+    programSelection.major1 = major1Select.value || null;
+    renderProgramSelectionDebug();
+  });
+
+  major2Select.addEventListener("change", () => {
+    programSelection.major2 = major2Select.value || null;
+    renderProgramSelectionDebug();
+  });
+
+  majorForMinorSelect.addEventListener("change", () => {
+    programSelection.majorForMinor = majorForMinorSelect.value || null;
+    renderProgramSelectionDebug();
+  });
+
+  minorSelect.addEventListener("change", () => {
+    programSelection.minor = minorSelect.value || null;
+    renderProgramSelectionDebug();
+  });
+
+  // Initial UI state
+  updateModeUI();
+}
+
+// Call this after DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+  initProgramCombinationSelector();
+});
