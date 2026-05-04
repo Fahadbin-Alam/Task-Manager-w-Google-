@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View
 } from "react-native";
 import { buildDailyAlexaBrief, connectAlexaMock } from "./src/services/alexaBridge";
@@ -40,6 +41,8 @@ function createId(prefix: string): string {
 }
 
 export default function App(): React.JSX.Element {
+  const { width } = useWindowDimensions();
+  const isNarrowPhone = width < 360;
   const [state, setState] = useState<PersistedState>(defaultState);
   const [isHydrated, setIsHydrated] = useState(false);
   const [activeScreen, setActiveScreen] = useState<"focus" | "dashboard">("focus");
@@ -364,7 +367,7 @@ export default function App(): React.JSX.Element {
                 </Pressable>
               </View>
 
-              <View style={styles.focusTopPanel}>
+              <View style={[styles.focusTopPanel, isNarrowPhone && styles.focusTopPanelStack]}>
                 <View style={styles.focusTopLeft}>
                   <Text style={styles.focusPanelTitle}>{selectedHabit ? selectedHabit.title : "Pick a habit"}</Text>
                   <Text style={styles.focusPanelMeta}>
@@ -389,7 +392,7 @@ export default function App(): React.JSX.Element {
                     {habitItems.length === 0 ? "No habits yet" : `${habitsDoneToday}/${habitItems.length} done today`}
                   </Text>
                 </View>
-                <View style={styles.focusTopRight}>
+                <View style={[styles.focusTopRight, isNarrowPhone && styles.focusTopRightStack]}>
                   <Text style={styles.focusPanelMeta}>Trend</Text>
                   <View style={styles.focusTopGraphRow}>
                     {selectedHabitTrend.map((day) => (
@@ -440,55 +443,59 @@ export default function App(): React.JSX.Element {
               ) : null}
 
               <View style={styles.focusTableCard}>
-                <View style={styles.weekTableHeader}>
-                  <Text style={styles.weekTableHabitHeader}>Habits</Text>
-                  {weekLabels.map((label, index) => (
-                    <Text key={`head-${weekDays[index]}`} style={styles.weekTableDayHeader}>
-                      {label}
-                    </Text>
-                  ))}
-                </View>
-                {habitItems.length === 0 ? (
-                  <Text style={styles.mutedText}>No habits yet.</Text>
-                ) : (
-                  habitItems.map((item) => {
-                    return (
-                      <View key={`table-${item.id}`} style={styles.weekTableRow}>
-                        <Pressable style={styles.weekTableHabitCell} onPress={() => setSelectedHabitId(item.id)}>
-                          <Text
-                            style={[
-                              styles.weekTableHabitText,
-                              selectedHabitId === item.id && styles.weekTableHabitTextActive
-                            ]}
-                          >
-                            {item.title}
-                          </Text>
-                        </Pressable>
-                        {weekDays.map((dayKey) => {
-                          const checked = isHabitDoneOnDate(item.id, dayKey);
-                          const isToday = dayKey === todayKey;
-                          return (
-                            <Pressable
-                              key={`${item.id}-week-${dayKey}`}
-                              style={[
-                                styles.weekTableTick,
-                                checked && styles.weekTableTickOn,
-                                isToday && styles.weekTableTickToday
-                              ]}
-                              onPress={() => {
-                                if (isToday) toggleMission(item);
-                              }}
-                            >
-                              <Text style={[styles.weekTableTickText, checked && styles.weekTableTickTextOn]}>
-                                {checked ? "v" : "x"}
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.weekTableScrollContent}>
+                  <View>
+                    <View style={styles.weekTableHeader}>
+                      <Text style={styles.weekTableHabitHeader}>Habits</Text>
+                      {weekLabels.map((label, index) => (
+                        <Text key={`head-${weekDays[index]}`} style={styles.weekTableDayHeader}>
+                          {label}
+                        </Text>
+                      ))}
+                    </View>
+                    {habitItems.length === 0 ? (
+                      <Text style={styles.mutedText}>No habits yet.</Text>
+                    ) : (
+                      habitItems.map((item) => {
+                        return (
+                          <View key={`table-${item.id}`} style={styles.weekTableRow}>
+                            <Pressable style={styles.weekTableHabitCell} onPress={() => setSelectedHabitId(item.id)}>
+                              <Text
+                                style={[
+                                  styles.weekTableHabitText,
+                                  selectedHabitId === item.id && styles.weekTableHabitTextActive
+                                ]}
+                              >
+                                {item.title}
                               </Text>
                             </Pressable>
-                          );
-                        })}
-                      </View>
-                    );
-                  })
-                )}
+                            {weekDays.map((dayKey) => {
+                              const checked = isHabitDoneOnDate(item.id, dayKey);
+                              const isToday = dayKey === todayKey;
+                              return (
+                                <Pressable
+                                  key={`${item.id}-week-${dayKey}`}
+                                  style={[
+                                    styles.weekTableTick,
+                                    checked && styles.weekTableTickOn,
+                                    isToday && styles.weekTableTickToday
+                                  ]}
+                                  onPress={() => {
+                                    if (isToday) toggleMission(item);
+                                  }}
+                                >
+                                  <Text style={[styles.weekTableTickText, checked && styles.weekTableTickTextOn]}>
+                                    {checked ? "v" : "x"}
+                                  </Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                        );
+                      })
+                    )}
+                  </View>
+                </ScrollView>
               </View>
             </>
           ) : (
@@ -795,6 +802,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.sm
   },
+  focusTopPanelStack: {
+    flexDirection: "column"
+  },
   focusTopLeft: {
     flex: 1
   },
@@ -805,6 +815,9 @@ const styles = StyleSheet.create({
     borderColor: palette.outline,
     backgroundColor: "rgba(18, 27, 46, 0.85)",
     padding: spacing.sm
+  },
+  focusTopRightStack: {
+    width: "100%"
   },
   focusPanelTitle: {
     color: palette.ink,
@@ -1377,8 +1390,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: palette.outline
   },
+  weekTableScrollContent: {
+    paddingBottom: 2
+  },
   weekTableHabitHeader: {
-    width: 108,
+    width: 120,
     color: palette.mutedInk,
     fontFamily: fonts.headline,
     fontSize: typeScale.caption
@@ -1398,7 +1414,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "rgba(34, 50, 81, 0.45)"
   },
   weekTableHabitCell: {
-    width: 108
+    width: 120
   },
   weekTableHabitText: {
     color: palette.ink,
