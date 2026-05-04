@@ -1,0 +1,51 @@
+// Render planner UI (updated with remove buttons)
+function renderPlanner() {
+  const container = document.getElementById("plannerContainer");
+  container.innerHTML = "";
+
+  if (plannerCourses.length === 0) {
+    container.innerHTML = "<p>No courses added yet.</p>";
+    return;
+  }
+
+  plannerCourses.forEach((course, index) => {
+    const div = document.createElement("div");
+    div.className = "course-item";
+
+    const text = document.createElement("span");
+    text.textContent = `${course.code} — ${course.name}`;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "Remove";
+    removeBtn.style.marginLeft = "12px";
+    removeBtn.style.padding = "4px 8px";
+    removeBtn.style.border = "none";
+    removeBtn.style.borderRadius = "4px";
+    removeBtn.style.background = "#d9534f";
+    removeBtn.style.color = "white";
+    removeBtn.style.cursor = "pointer";
+
+    removeBtn.onclick = () => removeCourse(index);
+
+    div.appendChild(text);
+    div.appendChild(removeBtn);
+    container.appendChild(div);
+  });
+}
+
+// Remove a course and update UI + backend
+async function removeCourse(index) {
+  plannerCourses.splice(index, 1);   // remove from array
+  renderPlanner();                   // update UI immediately
+
+  try {
+    await fetch("/api/planner", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ courses: plannerCourses })
+    });
+  } catch (err) {
+    console.error("Failed to update planner:", err);
+    alert("Error updating planner");
+  }
+}
