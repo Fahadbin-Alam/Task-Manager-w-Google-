@@ -14,6 +14,11 @@ venv/
 .vscode/
 .idea/
 
+# JavaScript / Expo
+node_modules/
+.expo/
+.expo-shared/
+
 # Logs and databases
 *.log
 *.sqlite3

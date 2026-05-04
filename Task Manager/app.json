@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Task Manager",
+    "slug": "shadow-quest-task-manager",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.fahad.shadowquest",
+      "adaptiveIcon": {
+        "backgroundColor": "#070A12"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.fahad.shadowquest"
+    },
+    "plugins": [
+      "expo-asset"
+    ]
+  }
+}
