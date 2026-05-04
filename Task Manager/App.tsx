@@ -11,7 +11,7 @@ import {
   TextInput,
   View
 } from "react-native";
-import { connectAlexaMock, buildDailyAlexaBrief } from "./src/services/alexaBridge";
+import { buildDailyAlexaBrief, connectAlexaMock } from "./src/services/alexaBridge";
 import { connectGoogleCalendarMock, syncItemsToGoogleCalendar } from "./src/services/googleCalendar";
 import { defaultState, loadState, saveState } from "./src/storage";
 import { fonts, palette, spacing, typeScale } from "./src/theme";
@@ -42,7 +42,9 @@ function createId(prefix: string): string {
 export default function App(): React.JSX.Element {
   const [state, setState] = useState<PersistedState>(defaultState);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [activeScreen, setActiveScreen] = useState<"focus" | "dashboard">("focus");
   const [titleDraft, setTitleDraft] = useState("");
+  const [habitDraft, setHabitDraft] = useState("");
   const [kindDraft, setKindDraft] = useState<ItemKind>("task");
   const [priorityDraft, setPriorityDraft] = useState<Priority>("mid");
   const [missionFilter, setMissionFilter] = useState<"all" | ItemKind>("all");
@@ -82,6 +84,14 @@ export default function App(): React.JSX.Element {
         .filter((item) => (missionFilter === "all" ? true : item.kind === missionFilter)),
     [state.items, missionFilter]
   );
+  const habitItems = useMemo(() => state.items.filter((item) => item.kind === "habit"), [state.items]);
+  const habitsDoneToday = useMemo(
+    () =>
+      habitItems.filter((item) =>
+        state.completions.some((entry) => entry.itemId === item.id && entry.dateKey === todayKey)
+      ).length,
+    [habitItems, state.completions, todayKey]
+  );
 
   function isDone(item: TaskItem): boolean {
     if (item.kind === "task") return item.oneOffDone;
@@ -106,6 +116,26 @@ export default function App(): React.JSX.Element {
       ]
     }));
     setTitleDraft("");
+  }
+
+  function addHabitFromFocus(): void {
+    const trimmed = habitDraft.trim();
+    if (!trimmed) return;
+    setState((previous) => ({
+      ...previous,
+      items: [
+        {
+          id: createId("habit"),
+          title: trimmed,
+          kind: "habit",
+          priority: "mid",
+          createdAt: new Date().toISOString(),
+          oneOffDone: false
+        },
+        ...previous.items
+      ]
+    }));
+    setHabitDraft("");
   }
 
   function toggleMission(item: TaskItem): void {
@@ -255,199 +285,268 @@ export default function App(): React.JSX.Element {
       <StatusBar style="light" />
       <SafeAreaView style={styles.safe}>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.heroCard}>
-            <Text style={styles.heroTag}>ANDROID MVP</Text>
-            <Text style={styles.heroTitle}>SHADOW TASK</Text>
-            <Text style={styles.heroSub}>Minimal missions. Maximum momentum.</Text>
-            <View style={styles.heroStats}>
-              <StatPill label="Level" value={String(level)} />
-              <StatPill label="Rank" value={rank} />
-              <StatPill label="XP" value={String(state.profile.xp)} />
-              <StatPill label="Streak" value={`${streak}d`} />
-            </View>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${Math.round(levelProgress.progressRatio * 100)}%` }]} />
-            </View>
-            <Text style={styles.progressMeta}>
-              {levelProgress.remainingXp} XP to reach level {levelProgress.nextLevel}
-            </Text>
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>New Mission</Text>
-            <TextInput
-              value={titleDraft}
-              onChangeText={setTitleDraft}
-              placeholder="Write one clear target..."
-              placeholderTextColor={palette.mutedInk}
-              style={styles.input}
+          <View style={styles.screenSwitchRow}>
+            <ScreenSwitchButton
+              label="Habit Focus"
+              active={activeScreen === "focus"}
+              onPress={() => setActiveScreen("focus")}
             />
-            <View style={styles.toggleRow}>
-              <ModeButton
-                label="Task"
-                active={kindDraft === "task"}
-                onPress={() => setKindDraft("task")}
-              />
-              <ModeButton
-                label="Habit"
-                active={kindDraft === "habit"}
-                onPress={() => setKindDraft("habit")}
-              />
-              <Pressable style={styles.primaryButton} onPress={addMission}>
-                <Text style={styles.primaryText}>Add</Text>
-              </Pressable>
-            </View>
-            <Text style={styles.mutedText}>Priority XP</Text>
-            <View style={styles.toggleRow}>
-              <PriorityButton
-                label="Low"
-                active={priorityDraft === "low"}
-                onPress={() => setPriorityDraft("low")}
-              />
-              <PriorityButton
-                label="Mid"
-                active={priorityDraft === "mid"}
-                onPress={() => setPriorityDraft("mid")}
-              />
-              <PriorityButton
-                label="High"
-                active={priorityDraft === "high"}
-                onPress={() => setPriorityDraft("high")}
-              />
-            </View>
+            <ScreenSwitchButton
+              label="Dashboard"
+              active={activeScreen === "dashboard"}
+              onPress={() => setActiveScreen("dashboard")}
+            />
           </View>
 
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Daily Quest</Text>
-            <Text style={styles.mutedText}>
-              Complete {DAILY_QUEST_TARGET} missions today for +{DAILY_QUEST_REWARD} XP.
-            </Text>
-            <Text style={styles.questProgress}>
-              Progress: {todayDoneCount}/{DAILY_QUEST_TARGET}
-            </Text>
-            <Pressable
-              style={[styles.primaryButton, !canClaimDailyQuest && styles.disabledButton]}
-              onPress={claimDailyQuest}
-              disabled={!canClaimDailyQuest}
-            >
-              <Text style={styles.primaryText}>
-                {questClaimed ? "Claimed" : canClaimDailyQuest ? "Claim Reward" : "Locked"}
-              </Text>
-            </Pressable>
-          </View>
+          {activeScreen === "focus" ? (
+            <>
+              <View style={styles.heroCard}>
+                <Text style={styles.heroTag}>MINIMAL MODE</Text>
+                <Text style={styles.heroTitle}>HABIT FOCUS</Text>
+                <Text style={styles.heroSub}>Check habits. Build streak. Keep it simple.</Text>
+                <Text style={styles.focusCountText}>
+                  {habitItems.length === 0 ? "No habits yet" : `${habitsDoneToday}/${habitItems.length} done today`}
+                </Text>
+              </View>
 
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Missions</Text>
-            <View style={styles.toggleRow}>
-              <FilterButton
-                label="All"
-                active={missionFilter === "all"}
-                onPress={() => setMissionFilter("all")}
-              />
-              <FilterButton
-                label="Tasks"
-                active={missionFilter === "task"}
-                onPress={() => setMissionFilter("task")}
-              />
-              <FilterButton
-                label="Habits"
-                active={missionFilter === "habit"}
-                onPress={() => setMissionFilter("habit")}
-              />
-            </View>
-            {missionItems.length === 0 ? (
-              <Text style={styles.mutedText}>No active missions. Add one and start streaking.</Text>
-            ) : (
-              missionItems.map((item) => {
-                const done = isDone(item);
-                return (
-                  <View key={item.id} style={styles.missionRow}>
-                    <View style={styles.missionMain}>
-                      <Text style={styles.missionTitle}>{item.title}</Text>
-                      <Text style={styles.missionMeta}>
-                        {item.kind.toUpperCase()} • {item.priority.toUpperCase()} XP •{" "}
-                        {item.kind === "habit" ? "Repeats daily" : "One-time"}
-                      </Text>
-                    </View>
-                    <View style={styles.rowButtons}>
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>Add Habit</Text>
+                <TextInput
+                  value={habitDraft}
+                  onChangeText={setHabitDraft}
+                  placeholder="One habit to repeat daily..."
+                  placeholderTextColor={palette.mutedInk}
+                  style={styles.input}
+                />
+                <Pressable style={styles.primaryButton} onPress={addHabitFromFocus}>
+                  <Text style={styles.primaryText}>Add Habit</Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>Today</Text>
+                {habitItems.length === 0 ? (
+                  <Text style={styles.mutedText}>Add your first habit above, then check it off here.</Text>
+                ) : (
+                  habitItems.map((item) => {
+                    const done = isDone(item);
+                    return (
                       <Pressable
-                        style={[styles.circleButton, done ? styles.circleDone : styles.circleOpen]}
+                        key={item.id}
+                        style={[styles.focusHabitRow, done && styles.focusHabitRowDone]}
                         onPress={() => toggleMission(item)}
                       >
-                        <Text style={styles.circleLabel}>{done ? "DONE" : "GO"}</Text>
+                        <Text style={styles.focusHabitTitle}>{item.title}</Text>
+                        <View style={[styles.focusCheckPill, done && styles.focusCheckPillDone]}>
+                          <Text style={styles.focusCheckText}>{done ? "DONE" : "CHECK"}</Text>
+                        </View>
                       </Pressable>
-                      <Pressable style={styles.deleteButton} onPress={() => deleteMission(item.id)}>
-                        <Text style={styles.deleteText}>X</Text>
-                      </Pressable>
-                    </View>
-                  </View>
-                );
-              })
-            )}
-          </View>
-
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Weekly Stats</Text>
-            <View style={styles.weekWrap}>
-              {weekly.map((day) => (
-                <View key={day.key} style={styles.weekColumn}>
-                  <View
-                    style={[
-                      styles.weekBar,
-                      {
-                        height: 14 + (70 * day.count) / maxWeekly,
-                        opacity: day.count > 0 ? 1 : 0.3
-                      }
-                    ]}
-                  />
-                  <Text style={styles.weekCount}>{day.count}</Text>
-                  <Text style={styles.weekLabel}>{day.day}</Text>
+                    );
+                  })
+                )}
+              </View>
+            </>
+          ) : (
+            <>
+              <View style={styles.heroCard}>
+                <Text style={styles.heroTag}>ANDROID MVP</Text>
+                <Text style={styles.heroTitle}>SHADOW TASK</Text>
+                <Text style={styles.heroSub}>Minimal missions. Maximum momentum.</Text>
+                <View style={styles.heroStats}>
+                  <StatPill label="Level" value={String(level)} />
+                  <StatPill label="Rank" value={rank} />
+                  <StatPill label="XP" value={String(state.profile.xp)} />
+                  <StatPill label="Streak" value={`${streak}d`} />
                 </View>
-              ))}
-            </View>
-          </View>
+                <View style={styles.progressTrack}>
+                  <View
+                    style={[styles.progressFill, { width: `${Math.round(levelProgress.progressRatio * 100)}%` }]}
+                  />
+                </View>
+                <Text style={styles.progressMeta}>
+                  {levelProgress.remainingXp} XP to reach level {levelProgress.nextLevel}
+                </Text>
+              </View>
 
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Integrations</Text>
-            <View style={styles.integrationRow}>
-              <Text style={styles.integrationTitle}>
-                Google Calendar {state.profile.linkedGoogle ? "• Linked" : "• Not Linked"}
-              </Text>
-              <Pressable style={styles.secondaryButton} onPress={linkGoogle}>
-                <Text style={styles.secondaryText}>Link</Text>
-              </Pressable>
-            </View>
-            <Pressable style={styles.primaryButton} onPress={syncGoogleNow}>
-              <Text style={styles.primaryText}>Sync Missions</Text>
-            </Pressable>
-            <View style={styles.integrationRow}>
-              <Text style={styles.integrationTitle}>
-                Alexa Briefings {state.profile.linkedAlexa ? "• Linked" : "• Not Linked"}
-              </Text>
-              <Pressable style={styles.secondaryButton} onPress={linkAlexa}>
-                <Text style={styles.secondaryText}>Link</Text>
-              </Pressable>
-            </View>
-            {state.profile.linkedAlexa ? (
-              <Pressable style={styles.primaryButton} onPress={previewAlexaBrief}>
-                <Text style={styles.primaryText}>Preview Alexa Brief</Text>
-              </Pressable>
-            ) : null}
-          </View>
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>New Mission</Text>
+                <TextInput
+                  value={titleDraft}
+                  onChangeText={setTitleDraft}
+                  placeholder="Write one clear target..."
+                  placeholderTextColor={palette.mutedInk}
+                  style={styles.input}
+                />
+                <View style={styles.toggleRow}>
+                  <ModeButton
+                    label="Task"
+                    active={kindDraft === "task"}
+                    onPress={() => setKindDraft("task")}
+                  />
+                  <ModeButton
+                    label="Habit"
+                    active={kindDraft === "habit"}
+                    onPress={() => setKindDraft("habit")}
+                  />
+                  <Pressable style={styles.primaryButton} onPress={addMission}>
+                    <Text style={styles.primaryText}>Add</Text>
+                  </Pressable>
+                </View>
+                <Text style={styles.mutedText}>Priority XP</Text>
+                <View style={styles.toggleRow}>
+                  <PriorityButton
+                    label="Low"
+                    active={priorityDraft === "low"}
+                    onPress={() => setPriorityDraft("low")}
+                  />
+                  <PriorityButton
+                    label="Mid"
+                    active={priorityDraft === "mid"}
+                    onPress={() => setPriorityDraft("mid")}
+                  />
+                  <PriorityButton
+                    label="High"
+                    active={priorityDraft === "high"}
+                    onPress={() => setPriorityDraft("high")}
+                  />
+                </View>
+              </View>
 
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Premium</Text>
-            <Text style={styles.mutedText}>Lifetime: $9.99 (hook ready, payment not wired yet).</Text>
-            <Text style={styles.mutedText}>Premium unlocks advanced analytics, smart scheduling, and voice packs.</Text>
-            <Pressable
-              style={[styles.primaryButton, state.profile.premiumUnlocked && styles.premiumDone]}
-              onPress={unlockPremiumLifetime}
-            >
-              <Text style={styles.primaryText}>
-                {state.profile.premiumUnlocked ? "Premium Active" : "Unlock Lifetime"}
-              </Text>
-            </Pressable>
-          </View>
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>Daily Quest</Text>
+                <Text style={styles.mutedText}>
+                  Complete {DAILY_QUEST_TARGET} missions today for +{DAILY_QUEST_REWARD} XP.
+                </Text>
+                <Text style={styles.questProgress}>
+                  Progress: {todayDoneCount}/{DAILY_QUEST_TARGET}
+                </Text>
+                <Pressable
+                  style={[styles.primaryButton, !canClaimDailyQuest && styles.disabledButton]}
+                  onPress={claimDailyQuest}
+                  disabled={!canClaimDailyQuest}
+                >
+                  <Text style={styles.primaryText}>
+                    {questClaimed ? "Claimed" : canClaimDailyQuest ? "Claim Reward" : "Locked"}
+                  </Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>Missions</Text>
+                <View style={styles.toggleRow}>
+                  <FilterButton
+                    label="All"
+                    active={missionFilter === "all"}
+                    onPress={() => setMissionFilter("all")}
+                  />
+                  <FilterButton
+                    label="Tasks"
+                    active={missionFilter === "task"}
+                    onPress={() => setMissionFilter("task")}
+                  />
+                  <FilterButton
+                    label="Habits"
+                    active={missionFilter === "habit"}
+                    onPress={() => setMissionFilter("habit")}
+                  />
+                </View>
+                {missionItems.length === 0 ? (
+                  <Text style={styles.mutedText}>No active missions. Add one and start streaking.</Text>
+                ) : (
+                  missionItems.map((item) => {
+                    const done = isDone(item);
+                    return (
+                      <View key={item.id} style={styles.missionRow}>
+                        <View style={styles.missionMain}>
+                          <Text style={styles.missionTitle}>{item.title}</Text>
+                          <Text style={styles.missionMeta}>
+                            {item.kind.toUpperCase()} | {item.priority.toUpperCase()} XP |{" "}
+                            {item.kind === "habit" ? "Repeats daily" : "One-time"}
+                          </Text>
+                        </View>
+                        <View style={styles.rowButtons}>
+                          <Pressable
+                            style={[styles.circleButton, done ? styles.circleDone : styles.circleOpen]}
+                            onPress={() => toggleMission(item)}
+                          >
+                            <Text style={styles.circleLabel}>{done ? "DONE" : "GO"}</Text>
+                          </Pressable>
+                          <Pressable style={styles.deleteButton} onPress={() => deleteMission(item.id)}>
+                            <Text style={styles.deleteText}>X</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    );
+                  })
+                )}
+              </View>
+
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>Weekly Stats</Text>
+                <View style={styles.weekWrap}>
+                  {weekly.map((day) => (
+                    <View key={day.key} style={styles.weekColumn}>
+                      <View
+                        style={[
+                          styles.weekBar,
+                          {
+                            height: 14 + (70 * day.count) / maxWeekly,
+                            opacity: day.count > 0 ? 1 : 0.3
+                          }
+                        ]}
+                      />
+                      <Text style={styles.weekCount}>{day.count}</Text>
+                      <Text style={styles.weekLabel}>{day.day}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>Integrations</Text>
+                <View style={styles.integrationRow}>
+                  <Text style={styles.integrationTitle}>
+                    Google Calendar {state.profile.linkedGoogle ? "| Linked" : "| Not Linked"}
+                  </Text>
+                  <Pressable style={styles.secondaryButton} onPress={linkGoogle}>
+                    <Text style={styles.secondaryText}>Link</Text>
+                  </Pressable>
+                </View>
+                <Pressable style={styles.primaryButton} onPress={syncGoogleNow}>
+                  <Text style={styles.primaryText}>Sync Missions</Text>
+                </Pressable>
+                <View style={styles.integrationRow}>
+                  <Text style={styles.integrationTitle}>
+                    Alexa Briefings {state.profile.linkedAlexa ? "| Linked" : "| Not Linked"}
+                  </Text>
+                  <Pressable style={styles.secondaryButton} onPress={linkAlexa}>
+                    <Text style={styles.secondaryText}>Link</Text>
+                  </Pressable>
+                </View>
+                {state.profile.linkedAlexa ? (
+                  <Pressable style={styles.primaryButton} onPress={previewAlexaBrief}>
+                    <Text style={styles.primaryText}>Preview Alexa Brief</Text>
+                  </Pressable>
+                ) : null}
+              </View>
+
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>Premium</Text>
+                <Text style={styles.mutedText}>Lifetime: $9.99 (hook ready, payment not wired yet).</Text>
+                <Text style={styles.mutedText}>
+                  Premium unlocks advanced analytics, smart scheduling, and voice packs.
+                </Text>
+                <Pressable
+                  style={[styles.primaryButton, state.profile.premiumUnlocked && styles.premiumDone]}
+                  onPress={unlockPremiumLifetime}
+                >
+                  <Text style={styles.primaryText}>
+                    {state.profile.premiumUnlocked ? "Premium Active" : "Unlock Lifetime"}
+                  </Text>
+                </Pressable>
+              </View>
+            </>
+          )}
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -460,6 +559,26 @@ function StatPill(props: { label: string; value: string }): React.JSX.Element {
       <Text style={styles.statLabel}>{props.label}</Text>
       <Text style={styles.statValue}>{props.value}</Text>
     </View>
+  );
+}
+
+function ScreenSwitchButton(props: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}): React.JSX.Element {
+  return (
+    <Pressable
+      style={[
+        styles.screenSwitchButton,
+        props.active ? styles.screenSwitchButtonActive : styles.screenSwitchButtonIdle
+      ]}
+      onPress={props.onPress}
+    >
+      <Text style={[styles.screenSwitchText, props.active && styles.screenSwitchTextActive]}>
+        {props.label}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -512,13 +631,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.xl
   },
+  screenSwitchRow: {
+    marginTop: spacing.sm,
+    flexDirection: "row",
+    gap: spacing.sm
+  },
+  screenSwitchButton: {
+    flex: 1,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingVertical: spacing.sm,
+    alignItems: "center"
+  },
+  screenSwitchButtonActive: {
+    borderColor: palette.neonCyan,
+    backgroundColor: "rgba(71, 244, 231, 0.2)"
+  },
+  screenSwitchButtonIdle: {
+    borderColor: palette.outline,
+    backgroundColor: "rgba(19, 27, 45, 0.6)"
+  },
+  screenSwitchText: {
+    color: palette.mutedInk,
+    fontFamily: fonts.body,
+    fontSize: typeScale.body
+  },
+  screenSwitchTextActive: {
+    color: palette.ink
+  },
   heroCard: {
     borderRadius: 18,
     borderWidth: 1,
     borderColor: palette.outline,
     backgroundColor: "rgba(9, 14, 28, 0.85)",
-    padding: spacing.lg,
-    marginTop: spacing.sm
+    padding: spacing.lg
   },
   heroTag: {
     color: palette.neonCyan,
@@ -538,6 +684,12 @@ const styles = StyleSheet.create({
     fontSize: typeScale.body,
     fontFamily: fonts.body,
     marginTop: spacing.xs
+  },
+  focusCountText: {
+    marginTop: spacing.md,
+    color: palette.neonGold,
+    fontSize: typeScale.section,
+    fontFamily: fonts.headline
   },
   heroStats: {
     flexDirection: "row",
@@ -786,6 +938,45 @@ const styles = StyleSheet.create({
   deleteText: {
     color: palette.danger,
     fontFamily: fonts.headline
+  },
+  focusHabitRow: {
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: palette.outline,
+    backgroundColor: "rgba(17, 25, 43, 0.7)",
+    padding: spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: spacing.sm
+  },
+  focusHabitRowDone: {
+    borderColor: palette.success,
+    backgroundColor: "rgba(88, 247, 165, 0.12)"
+  },
+  focusHabitTitle: {
+    flex: 1,
+    color: palette.ink,
+    fontSize: typeScale.section,
+    fontFamily: fonts.body
+  },
+  focusCheckPill: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: palette.neonBlue,
+    backgroundColor: "rgba(65, 194, 255, 0.2)",
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm
+  },
+  focusCheckPillDone: {
+    borderColor: palette.success,
+    backgroundColor: "rgba(88, 247, 165, 0.25)"
+  },
+  focusCheckText: {
+    color: palette.ink,
+    fontFamily: fonts.headline,
+    fontSize: typeScale.caption,
+    letterSpacing: 1
   },
   weekWrap: {
     flexDirection: "row",
