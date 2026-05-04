@@ -371,8 +371,8 @@ export default function App(): React.JSX.Element {
                 </View>
 
                 {habitItems.length > 0 ? (
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.habitCardRow}>
-                    {habitItems.slice(0, 6).map((item) => {
+                  <View style={styles.habitCardColumn}>
+                    {habitItems.map((item) => {
                       const weekDone = weekDays.filter((dayKey) => isHabitDoneOnDate(item.id, dayKey)).length;
                       const done = isDone(item);
                       return (
@@ -399,7 +399,7 @@ export default function App(): React.JSX.Element {
                         </Pressable>
                       );
                     })}
-                  </ScrollView>
+                  </View>
                 ) : null}
               </View>
 
@@ -919,12 +919,12 @@ const styles = StyleSheet.create({
     fontFamily: fonts.headline,
     lineHeight: 25
   },
-  habitCardRow: {
+  habitCardColumn: {
     gap: spacing.sm,
     paddingVertical: spacing.xs
   },
   habitMiniCard: {
-    width: 172,
+    width: "100%",
     borderRadius: 12,
     borderWidth: 1,
     borderColor: palette.outline,
