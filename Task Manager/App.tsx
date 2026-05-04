@@ -87,6 +87,8 @@ export default function App(): React.JSX.Element {
   );
   const habitItems = useMemo(() => state.items.filter((item) => item.kind === "habit"), [state.items]);
   const trendDays = useMemo(() => lastNDays(14), [todayKey]);
+  const weekDays = useMemo(() => lastNDays(7), [todayKey]);
+  const heatmapDays = useMemo(() => lastNDays(35), [todayKey]);
   const selectedHabit = useMemo(
     () => habitItems.find((item) => item.id === selectedHabitId) ?? null,
     [habitItems, selectedHabitId]
@@ -113,6 +115,26 @@ export default function App(): React.JSX.Element {
     });
   }, [selectedHabit, trendDays, state.completions, todayKey]);
   const selectedHabitCompletedDays = selectedHabitTrend.filter((day) => day.done).length;
+  const selectedHabitWeekDone = useMemo(() => {
+    if (!selectedHabit) return 0;
+    return weekDays.filter((dayKey) =>
+      state.completions.some((entry) => entry.itemId === selectedHabit.id && entry.dateKey === dayKey)
+    ).length;
+  }, [selectedHabit, weekDays, state.completions]);
+  const weekLabels = useMemo(
+    () =>
+      weekDays.map((dayKey) =>
+        parseDateKey(dayKey).toLocaleDateString(undefined, { weekday: "short" }).slice(0, 2).toUpperCase()
+      ),
+    [weekDays]
+  );
+  const heatmapWeeks = useMemo(() => {
+    const chunks: string[][] = [];
+    for (let i = 0; i < heatmapDays.length; i += 7) {
+      chunks.push(heatmapDays.slice(i, i + 7));
+    }
+    return chunks;
+  }, [heatmapDays]);
 
   useEffect(() => {
     if (habitItems.length === 0) {
@@ -127,6 +149,10 @@ export default function App(): React.JSX.Element {
   function isDone(item: TaskItem): boolean {
     if (item.kind === "task") return item.oneOffDone;
     return state.completions.some((entry) => entry.itemId === item.id && entry.dateKey === todayKey);
+  }
+
+  function isHabitDoneOnDate(itemId: string, dateKey: string): boolean {
+    return state.completions.some((entry) => entry.itemId === itemId && entry.dateKey === dateKey);
   }
 
   function addMission(): void {
@@ -319,9 +345,9 @@ export default function App(): React.JSX.Element {
           {activeScreen === "focus" ? (
             <>
               <View style={styles.heroCard}>
-                <Text style={styles.heroTag}>MINIMAL MODE</Text>
-                <Text style={styles.heroTitle}>HABIT FOCUS</Text>
-                <Text style={styles.heroSub}>Check habits. Build streak. Keep it simple.</Text>
+                <Text style={styles.heroTag}>HABITS</Text>
+                <Text style={styles.heroTitle}>Minimal Tracker</Text>
+                <Text style={styles.heroSub}>Tap habit name for graph. Tap check button to mark done.</Text>
                 <Text style={styles.focusCountText}>
                   {habitItems.length === 0 ? "No habits yet" : `${habitsDoneToday}/${habitItems.length} done today`}
                 </Text>
@@ -331,60 +357,64 @@ export default function App(): React.JSX.Element {
               </View>
 
               <View style={styles.card}>
-                <Text style={styles.sectionTitle}>Add Habit</Text>
-                <TextInput
-                  value={habitDraft}
-                  onChangeText={setHabitDraft}
-                  placeholder="One habit to repeat daily..."
-                  placeholderTextColor={palette.mutedInk}
-                  style={styles.input}
-                />
-                <Pressable style={styles.primaryButton} onPress={addHabitFromFocus}>
-                  <Text style={styles.primaryText}>Add Habit</Text>
-                </Pressable>
-              </View>
+                <View style={styles.minimalAddRow}>
+                  <TextInput
+                    value={habitDraft}
+                    onChangeText={setHabitDraft}
+                    placeholder="Add habit..."
+                    placeholderTextColor={palette.mutedInk}
+                    style={styles.minimalInput}
+                  />
+                  <Pressable style={styles.minimalAddButton} onPress={addHabitFromFocus}>
+                    <Text style={styles.minimalAddText}>+</Text>
+                  </Pressable>
+                </View>
 
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>Today</Text>
-                {habitItems.length === 0 ? (
-                  <Text style={styles.mutedText}>Add your first habit above, then check it off here.</Text>
-                ) : (
-                  habitItems.map((item) => {
-                    const done = isDone(item);
-                    return (
-                      <View key={item.id} style={[styles.focusHabitRow, done && styles.focusHabitRowDone]}>
-                        <Pressable style={styles.focusHabitInfo} onPress={() => setSelectedHabitId(item.id)}>
-                          <Text style={styles.focusHabitTitle}>{item.title}</Text>
-                          <Text style={styles.focusHabitHint}>
-                            {selectedHabitId === item.id ? "Showing graph below" : "Tap to view graph"}
-                          </Text>
-                        </Pressable>
+                {habitItems.length > 0 ? (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.habitCardRow}>
+                    {habitItems.slice(0, 6).map((item) => {
+                      const weekDone = weekDays.filter((dayKey) => isHabitDoneOnDate(item.id, dayKey)).length;
+                      const done = isDone(item);
+                      return (
                         <Pressable
-                          style={[styles.focusCheckPill, done && styles.focusCheckPillDone]}
-                          onPress={() => toggleMission(item)}
+                          key={item.id}
+                          style={[styles.habitMiniCard, selectedHabitId === item.id && styles.habitMiniCardActive]}
+                          onPress={() => setSelectedHabitId(item.id)}
                         >
-                          <Text style={styles.focusCheckText}>{done ? "DONE" : "CHECK"}</Text>
+                          <Text style={styles.habitMiniTitle}>{item.title}</Text>
+                          <Text style={styles.habitMiniMeta}>
+                            {weekDone}/7 week {done ? "| done today" : ""}
+                          </Text>
+                          <View style={styles.sparkRow}>
+                            {weekDays.map((dayKey) => {
+                              const dayDone = isHabitDoneOnDate(item.id, dayKey);
+                              return (
+                                <View
+                                  key={`${item.id}-${dayKey}`}
+                                  style={[styles.sparkBar, dayDone ? styles.sparkBarOn : styles.sparkBarOff]}
+                                />
+                              );
+                            })}
+                          </View>
                         </Pressable>
-                      </View>
-                    );
-                  })
-                )}
+                      );
+                    })}
+                  </ScrollView>
+                ) : null}
               </View>
 
               {selectedHabit ? (
                 <View style={styles.card}>
-                  <Text style={styles.sectionTitle}>{selectedHabit.title} Trend</Text>
-                  <Text style={styles.mutedText}>
-                    {selectedHabitCompletedDays}/14 days completed
-                  </Text>
-                  <View style={styles.focusGraphRow}>
+                  <Text style={styles.sectionTitle}>{selectedHabit.title} Graph</Text>
+                  <Text style={styles.mutedText}>{selectedHabitCompletedDays}/14 days completed</Text>
+                  <View style={styles.focusGraphRowCompact}>
                     {selectedHabitTrend.map((day) => (
                       <View key={day.key} style={styles.focusGraphCol}>
                         <View
                           style={[
                             styles.focusGraphBar,
                             day.done ? styles.focusGraphBarDone : styles.focusGraphBarMiss,
-                            { height: day.done ? 46 : 12 },
+                            { height: day.done ? 48 : 12 },
                             day.isToday && styles.focusGraphBarToday
                           ]}
                         />
@@ -392,8 +422,81 @@ export default function App(): React.JSX.Element {
                       </View>
                     ))}
                   </View>
+                  <Text style={styles.mutedText}>
+                    This week: {selectedHabitWeekDone}/7
+                  </Text>
+                  <View style={styles.heatmapWrap}>
+                    {heatmapWeeks.map((week, weekIndex) => (
+                      <View key={`week-${weekIndex}`} style={styles.heatmapCol}>
+                        {week.map((dayKey) => {
+                          const dayDone = isHabitDoneOnDate(selectedHabit.id, dayKey);
+                          const isToday = dayKey === todayKey;
+                          return (
+                            <View
+                              key={`heat-${dayKey}`}
+                              style={[
+                                styles.heatCell,
+                                dayDone ? styles.heatCellDone : styles.heatCellOff,
+                                isToday && styles.heatCellToday
+                              ]}
+                            />
+                          );
+                        })}
+                      </View>
+                    ))}
+                  </View>
                 </View>
               ) : null}
+
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>Weekly Table</Text>
+                <View style={styles.weekTableHeader}>
+                  <Text style={styles.weekTableHabitHeader}>Habit</Text>
+                  {weekLabels.map((label, index) => (
+                    <Text key={`head-${weekDays[index]}`} style={styles.weekTableDayHeader}>
+                      {label}
+                    </Text>
+                  ))}
+                </View>
+                {habitItems.length === 0 ? (
+                  <Text style={styles.mutedText}>No habits yet.</Text>
+                ) : (
+                  habitItems.map((item) => {
+                    const doneToday = isDone(item);
+                    return (
+                      <View key={`table-${item.id}`} style={styles.weekTableRow}>
+                        <Pressable style={styles.weekTableHabitCell} onPress={() => setSelectedHabitId(item.id)}>
+                          <Text style={styles.weekTableHabitText}>{item.title}</Text>
+                        </Pressable>
+                        {weekDays.map((dayKey) => {
+                          const checked = isHabitDoneOnDate(item.id, dayKey);
+                          const isToday = dayKey === todayKey;
+                          return (
+                            <Pressable
+                              key={`${item.id}-week-${dayKey}`}
+                              style={[
+                                styles.weekTableTick,
+                                checked && styles.weekTableTickOn,
+                                isToday && styles.weekTableTickToday
+                              ]}
+                              onPress={() => {
+                                if (isToday) toggleMission(item);
+                              }}
+                            >
+                              <Text style={[styles.weekTableTickText, checked && styles.weekTableTickTextOn]}>
+                                {checked ? "✓" : isToday ? "•" : "x"}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
+                        <View style={[styles.weekTableTodayTag, doneToday && styles.weekTableTodayTagOn]}>
+                          <Text style={styles.weekTableTodayTagText}>{doneToday ? "DONE" : "PEND"}</Text>
+                        </View>
+                      </View>
+                    );
+                  })
+                )}
+              </View>
             </>
           ) : (
             <>
@@ -783,6 +886,87 @@ const styles = StyleSheet.create({
     fontSize: typeScale.body,
     fontFamily: fonts.body
   },
+  minimalAddRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm
+  },
+  minimalInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: palette.outline,
+    borderRadius: 12,
+    backgroundColor: "rgba(24, 34, 58, 0.5)",
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    color: palette.ink,
+    fontSize: typeScale.body,
+    fontFamily: fonts.body
+  },
+  minimalAddButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: palette.neonBlue,
+    backgroundColor: "rgba(65, 194, 255, 0.2)",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  minimalAddText: {
+    color: palette.ink,
+    fontSize: 24,
+    fontFamily: fonts.headline,
+    lineHeight: 25
+  },
+  habitCardRow: {
+    gap: spacing.sm,
+    paddingVertical: spacing.xs
+  },
+  habitMiniCard: {
+    width: 172,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: palette.outline,
+    backgroundColor: "rgba(16, 24, 41, 0.8)",
+    padding: spacing.sm,
+    gap: spacing.xs
+  },
+  habitMiniCardActive: {
+    borderColor: palette.neonCyan,
+    backgroundColor: "rgba(26, 39, 66, 0.9)"
+  },
+  habitMiniTitle: {
+    color: palette.ink,
+    fontFamily: fonts.body,
+    fontSize: typeScale.body
+  },
+  habitMiniMeta: {
+    color: palette.mutedInk,
+    fontFamily: fonts.body,
+    fontSize: typeScale.caption
+  },
+  sparkRow: {
+    marginTop: spacing.xs,
+    flexDirection: "row",
+    gap: 4,
+    alignItems: "flex-end"
+  },
+  sparkBar: {
+    width: 16,
+    borderRadius: 4,
+    borderWidth: 1
+  },
+  sparkBarOn: {
+    height: 20,
+    borderColor: palette.success,
+    backgroundColor: "rgba(88, 247, 165, 0.65)"
+  },
+  sparkBarOff: {
+    height: 10,
+    borderColor: palette.outline,
+    backgroundColor: "rgba(34, 50, 81, 0.4)"
+  },
   toggleRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -1038,6 +1222,112 @@ const styles = StyleSheet.create({
     color: palette.mutedInk,
     fontSize: 10,
     fontFamily: fonts.body
+  },
+  focusGraphRowCompact: {
+    marginTop: spacing.sm,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between"
+  },
+  heatmapWrap: {
+    marginTop: spacing.sm,
+    flexDirection: "row",
+    gap: 4
+  },
+  heatmapCol: {
+    gap: 4
+  },
+  heatCell: {
+    width: 12,
+    height: 12,
+    borderRadius: 3,
+    borderWidth: 1
+  },
+  heatCellDone: {
+    borderColor: palette.success,
+    backgroundColor: "rgba(88, 247, 165, 0.65)"
+  },
+  heatCellOff: {
+    borderColor: palette.outline,
+    backgroundColor: "rgba(34, 50, 81, 0.4)"
+  },
+  heatCellToday: {
+    borderColor: palette.neonCyan
+  },
+  weekTableHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingBottom: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.outline
+  },
+  weekTableHabitHeader: {
+    width: 108,
+    color: palette.mutedInk,
+    fontFamily: fonts.headline,
+    fontSize: typeScale.caption
+  },
+  weekTableDayHeader: {
+    width: 28,
+    textAlign: "center",
+    color: palette.mutedInk,
+    fontFamily: fonts.headline,
+    fontSize: 11
+  },
+  weekTableRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(34, 50, 81, 0.45)"
+  },
+  weekTableHabitCell: {
+    width: 108
+  },
+  weekTableHabitText: {
+    color: palette.ink,
+    fontFamily: fonts.body,
+    fontSize: typeScale.caption
+  },
+  weekTableTick: {
+    width: 28,
+    height: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "transparent"
+  },
+  weekTableTickOn: {
+    backgroundColor: "rgba(71, 244, 231, 0.2)"
+  },
+  weekTableTickToday: {
+    borderColor: palette.neonBlue
+  },
+  weekTableTickText: {
+    color: palette.mutedInk,
+    fontFamily: fonts.headline,
+    fontSize: 12
+  },
+  weekTableTickTextOn: {
+    color: palette.neonCyan
+  },
+  weekTableTodayTag: {
+    marginLeft: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: palette.outline
+  },
+  weekTableTodayTagOn: {
+    borderColor: palette.success,
+    backgroundColor: "rgba(88, 247, 165, 0.12)"
+  },
+  weekTableTodayTagText: {
+    color: palette.mutedInk,
+    fontFamily: fonts.headline,
+    fontSize: 10
   },
   weekWrap: {
     flexDirection: "row",
